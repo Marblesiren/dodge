@@ -78,21 +78,21 @@
 
     /* Custom Retro Shadow */
     .retro-text-shadow {
-      text-shadow: 2px 2px 0px #ff0055;
+      text-shadow: 2px 2px 0px #333333;
     }
     
     .modern-neon-glow {
-      box-shadow: 0 0 20px rgba(0, 255, 242, 0.6), inset 0 0 10px rgba(0, 255, 242, 0.4);
+      box-shadow: 0 0 15px rgba(255, 255, 255, 0.25), inset 0 0 8px rgba(255, 255, 255, 0.15);
     }
 
     /* Toggle Switch Custom Styling */
     .toggle-checkbox:checked {
       right: 0;
-      border-color: #00fff2;
+      border-color: #ffffff;
     }
     .toggle-checkbox:checked + .toggle-label {
-      background-color: #0f172a;
-      border-color: #00fff2;
+      background-color: #121212;
+      border-color: #ffffff;
     }
   </style>
 </head>
@@ -113,19 +113,19 @@
   </svg>
 
   <!-- Main Arcade Frame -->
-  <div id="arcade-cabinet" class="w-full max-w-2xl bg-black border-2 border-neutral-800 rounded-xl p-4 flex flex-col items-center relative crt-container modern-neon-glow transition-all duration-300">
+  <div id="arcade-cabinet" class="w-full max-w-2xl bg-black border-4 border-white rounded-none p-4 flex flex-col items-center relative crt-container modern-neon-glow transition-all duration-300">
     
     <!-- Screen Scanlines & Vignette (Toggled by Retro State) -->
-    <div id="crt-overlay" class="absolute inset-0 scanlines crt-flicker pointer-events-none z-10 rounded-xl"></div>
-    <div id="crt-vignette-overlay" class="absolute inset-0 crt-vignette pointer-events-none z-9 rounded-xl"></div>
+    <div id="crt-overlay" class="absolute inset-0 scanlines crt-flicker pointer-events-none z-10 rounded-none"></div>
+    <div id="crt-vignette-overlay" class="absolute inset-0 crt-vignette pointer-events-none z-9 rounded-none"></div>
 
     <!-- Header Panel -->
     <div class="w-full border-b border-neutral-800 pb-2 mb-4 flex justify-between items-center z-20">
       <div class="flex items-center space-x-2">
-        <span class="w-3 h-3 bg-red-600 rounded-full animate-pulse"></span>
-        <h1 class="pixel-font text-xs tracking-wider text-neutral-400">WHITE_ROOM.EXE</h1>
+        <span class="w-3 h-3 bg-white rounded-none animate-pulse"></span>
+        <h1 class="pixel-font text-xs tracking-wider text-white">WHITE_ROOM.EXE</h1>
       </div>
-      <div class="text-xs text-cyan-400 font-mono tracking-widest">v2.0 // ANTIGRAVITY</div>
+      <div class="text-xs text-neutral-400 font-mono tracking-widest">v2.0 // ANTIGRAVITY</div>
     </div>
 
     <!-- 1. MAIN MENU SCREEN -->
@@ -134,7 +134,7 @@
         WHITE_ROOM.EXE:<br>ANTIGRAVITY 2.0
       </h2>
       
-      <p class="text-center text-sm max-w-md text-neutral-400 mb-8 border border-neutral-800 p-4 bg-neutral-950/50 rounded leading-relaxed">
+      <p class="text-center text-sm max-w-md text-white mb-8 border-2 border-white p-4 bg-neutral-950/50 rounded-none leading-relaxed">
         "Weiche aus. Analysiere. Sterbe. Versuche es immer wieder, bis du diesen unbesiegbaren Boss besiegst."
       </p>
 
@@ -142,12 +142,15 @@
       <div class="w-full max-w-sm space-y-6 mb-8">
         <!-- Mode Select -->
         <div>
-          <label class="block text-xs uppercase text-neutral-500 mb-2 font-bold tracking-wider">Militärisches Protokoll (Schwierigkeit):</label>
-          <div class="grid grid-cols-2 gap-4">
-            <button id="mode-normal-btn" class="py-2 border-2 border-cyan-400 bg-cyan-950/20 text-cyan-400 pixel-font text-[10px] rounded hover:bg-cyan-400/10 transition-colors focus:outline-none">
+          <label class="block text-xs uppercase text-neutral-400 mb-2 font-bold tracking-wider">Militärisches Protokoll (Schwierigkeit):</label>
+          <div class="grid grid-cols-3 gap-2">
+            <button id="mode-easy-btn" class="py-2 border-2 border-neutral-700 bg-black text-neutral-400 pixel-font text-[8px] sm:text-[9px] rounded-none hover:border-white hover:text-white transition-colors focus:outline-none">
+              [ EINFACH ]
+            </button>
+            <button id="mode-normal-btn" class="py-2 border-2 border-white bg-white text-black pixel-font text-[8px] sm:text-[9px] rounded-none focus:outline-none">
               [ NORMAL ]
             </button>
-            <button id="mode-hard-btn" class="py-2 border-2 border-neutral-800 bg-transparent text-neutral-500 pixel-font text-[10px] rounded hover:border-red-600 hover:text-red-500 transition-colors focus:outline-none">
+            <button id="mode-hard-btn" class="py-2 border-2 border-neutral-700 bg-black text-neutral-400 pixel-font text-[8px] sm:text-[9px] rounded-none hover:border-white hover:text-white transition-colors focus:outline-none">
               [ SCHWER ]
             </button>
           </div>
@@ -160,19 +163,19 @@
             <span id="graphics-desc" class="text-xs text-neutral-500">Retro (CRT, Abweichung, Scanlines)</span>
           </div>
           <div class="relative inline-block w-12 mr-2 align-middle select-none transition duration-200 ease-in">
-            <input type="checkbox" name="toggle" id="graphics-toggle" checked class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-cyan-400 border-4 border-black appearance-none cursor-pointer transition-all duration-300 right-0"/>
+            <input type="checkbox" name="toggle" id="graphics-toggle" checked class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 border-black appearance-none cursor-pointer transition-all duration-300 right-0"/>
             <label for="graphics-toggle" class="toggle-label block overflow-hidden h-6 rounded-full bg-neutral-900 border-2 border-neutral-800 cursor-pointer"></label>
           </div>
         </div>
       </div>
 
       <!-- Start Button -->
-      <button id="start-btn" class="w-full max-w-sm py-4 border-2 border-white bg-white text-black hover:bg-transparent hover:text-white transition-all duration-300 pixel-font text-xs tracking-widest font-bold focus:outline-none">
+      <button id="start-btn" class="w-full max-w-sm py-4 border-2 border-white bg-white text-black hover:bg-transparent hover:text-white transition-all duration-300 pixel-font text-xs tracking-widest font-bold rounded-none focus:outline-none">
         SYSTEM STARTEN
       </button>
 
       <!-- Keyboard Guide -->
-      <div class="mt-8 text-center text-xs text-neutral-600">
+      <div class="mt-8 text-center text-xs text-neutral-500">
         Steuerung: [WASD] / [Pfeiltasten] = Bewegen &bull; [W / Pfeil Oben] = Springen (Wand-Modus) &bull; [Leertaste] = Angriff
       </div>
     </div>
@@ -180,25 +183,25 @@
     <!-- 2. GAME SCREEN (CANVAS CONTAINER) -->
     <div id="game-screen" class="hidden w-full flex flex-col items-center z-20">
       <!-- Game Info Bar -->
-      <div class="w-full flex justify-between items-center mb-2 px-1 text-xs text-neutral-400 font-mono">
+      <div class="w-full flex justify-between items-center mb-2 px-1 text-xs text-white font-mono">
         <div id="hud-mode">MODUS: NORMAL</div>
-        <div id="hud-stage" class="pixel-font text-[9px] text-red-500">ANGRIFF: GAUNTLET</div>
+        <div id="hud-stage" class="pixel-font text-[9px] text-white">ANGRIFF: GAUNTLET</div>
       </div>
       
       <!-- HTML5 Canvas -->
-      <div class="relative bg-black border border-neutral-800 rounded">
+      <div class="relative bg-black border-2 border-white rounded-none">
         <canvas id="gameCanvas" width="600" height="600" class="block w-[300px] h-[300px] sm:w-[500px] sm:h-[500px] md:w-[600px] md:h-[600px] pixelated"></canvas>
       </div>
       
       <!-- In-Game Hint -->
-      <div class="mt-3 text-center text-[10px] text-neutral-500 font-mono tracking-wider animate-pulse">
+      <div class="mt-3 text-center text-[10px] text-neutral-400 font-mono tracking-wider animate-pulse">
         [ LEERTASTE ] IM SLIDER-ZENTRUM FÜR KRITISCHEN SCHADEN DRÜCKEN
       </div>
     </div>
 
     <!-- 3. GAME OVER SCREEN -->
     <div id="death-screen" class="hidden w-full flex flex-col items-center justify-center py-12 px-4 z-20 transition-all duration-300">
-      <h2 class="pixel-font text-red-600 text-lg md:text-xl text-center mb-6 tracking-wider animate-pulse">
+      <h2 class="pixel-font text-white text-lg md:text-xl text-center mb-6 tracking-wider animate-pulse">
         VERBINDUNG VERLOREN.<br>SYSTEM ABGESTÜRZT.
       </h2>
       <p class="text-center text-sm text-neutral-400 mb-8 max-w-sm">
@@ -206,37 +209,37 @@
         Der weiße Raum toleriert keine Fehler.
       </p>
       
-      <div class="w-full max-w-sm bg-neutral-950 border border-neutral-900 rounded p-4 mb-8 text-xs font-mono text-left space-y-1">
+      <div class="w-full max-w-sm bg-neutral-900 border-2 border-white rounded-none p-4 mb-8 text-xs font-mono text-left space-y-1">
         <div class="text-neutral-500">// CRASH DUMP ANALYSIS:</div>
         <div>Uhrzeit: <span id="dump-time" class="text-white"></span></div>
-        <div>Erreichte Phase: <span id="dump-phase" class="text-red-500"></span></div>
-        <div>Schaden verursacht: <span id="dump-damage" class="text-cyan-400"></span> HP</div>
+        <div>Erreichte Phase: <span id="dump-phase" class="text-white"></span></div>
+        <div>Schaden verursacht: <span id="dump-damage" class="text-white"></span> HP</div>
       </div>
 
-      <button id="retry-btn" class="w-full max-w-sm py-3 border-2 border-red-600 bg-red-950/20 text-red-500 hover:bg-red-600 hover:text-white transition-all duration-300 pixel-font text-xs tracking-wider font-bold focus:outline-none">
+      <button id="retry-btn" class="w-full max-w-sm py-3 border-2 border-white bg-white text-black hover:bg-black hover:text-white transition-all duration-300 pixel-font text-xs tracking-wider font-bold rounded-none focus:outline-none">
         PROTOKOLL NEUSTARTEN
       </button>
     </div>
 
     <!-- 4. VICTORY SCREEN -->
     <div id="victory-screen" class="hidden w-full flex flex-col items-center justify-center py-12 px-4 z-20 transition-all duration-300">
-      <h2 class="pixel-font text-cyan-400 text-lg md:text-xl text-center mb-6 tracking-widest animate-bounce">
+      <h2 class="pixel-font text-white text-lg md:text-xl text-center mb-6 tracking-widest animate-bounce">
         NIHIL.CORE GEKNACKT.<br>WHITE_ROOM BEFREIT!
       </h2>
       <p class="text-center text-sm text-neutral-300 mb-8 max-w-sm">
         Du hast das Unmögliche überlebt und die Antigravitations-Barriere überwunden. Die Simulation kollabiert.
       </p>
 
-      <div class="w-full max-w-sm bg-neutral-950 border border-neutral-900 rounded p-4 mb-8 text-xs font-mono text-left space-y-2">
+      <div class="w-full max-w-sm bg-neutral-900 border-2 border-white rounded-none p-4 mb-8 text-xs font-mono text-left space-y-2">
         <div class="text-neutral-500">// ERGEBNISPROTOKOLL:</div>
         <div class="flex justify-between"><span>Modus:</span><span id="stat-mode" class="text-white"></span></div>
-        <div class="flex justify-between"><span>Verbleibende HP:</span><span id="stat-hp" class="text-green-500"></span></div>
-        <div class="flex justify-between"><span>Kritische Treffer:</span><span id="stat-crits" class="text-yellow-400"></span></div>
-        <div class="flex justify-between"><span>Erlittene Treffer:</span><span id="stat-hits" class="text-red-500"></span></div>
-        <div class="flex justify-between"><span>Gesamtzeit:</span><span id="stat-time" class="text-cyan-400"></span></div>
+        <div class="flex justify-between"><span>Verbleibende HP:</span><span id="stat-hp" class="text-white"></span></div>
+        <div class="flex justify-between"><span>Kritische Treffer:</span><span id="stat-crits" class="text-white"></span></div>
+        <div class="flex justify-between"><span>Erlittene Treffer:</span><span id="stat-hits" class="text-white"></span></div>
+        <div class="flex justify-between"><span>Gesamtzeit:</span><span id="stat-time" class="text-white"></span></div>
       </div>
 
-      <button id="back-to-menu-btn" class="w-full max-w-sm py-3 border-2 border-cyan-400 bg-cyan-950/20 text-cyan-400 hover:bg-cyan-400 hover:text-black transition-all duration-300 pixel-font text-xs tracking-wider font-bold focus:outline-none">
+      <button id="back-to-menu-btn" class="w-full max-w-sm py-3 border-2 border-white bg-white text-black hover:bg-black hover:text-white transition-all duration-300 pixel-font text-xs tracking-wider font-bold rounded-none focus:outline-none">
         ZURÜCK ZUM HAUPTMENÜ
       </button>
     </div>
@@ -455,6 +458,10 @@
         this.isPlayingMusic = false;
       }
 
+      setTempo(t) {
+        this.tempo = t;
+      }
+
       scheduleBeat(beat, time) {
         // Core Drums
         let isKick = beat % 8 === 0 || beat % 8 === 4;
@@ -554,6 +561,11 @@
     let gameState = 'MENU'; // 'MENU', 'INTRO', 'DODGE', 'SLIDER', 'TRANSITION', 'GAMEOVER', 'VICTORY'
     let gameFrame = 0;
     
+    // Selection menu and heal charges
+    let transitionSelect = 0; // 0 = Angriff, 1 = Heilung
+    let healCharges = 5;      // Max 5 heals
+    let healAnimTimer = 0;
+    
     // Player settings
     let player = {
       x: 300,
@@ -580,7 +592,12 @@
         this.gravityDir = 'NONE';
         this.onGround = false;
         
-        if (mode === 'NORMAL') {
+        if (mode === 'EINFACH') {
+          this.hp = 200;
+          this.maxHp = 200;
+          this.speed = 2.2;
+          this.hitboxRadius = 2;
+        } else if (mode === 'NORMAL') {
           this.hp = 100;
           this.maxHp = 100;
           this.speed = 2.28;
@@ -706,16 +723,16 @@
       currentMode = mode;
       document.getElementById('hud-mode').innerText = `MODUS: ${mode}`;
       
+      const easyBtn = document.getElementById('mode-easy-btn');
       const normBtn = document.getElementById('mode-normal-btn');
       const hardBtn = document.getElementById('mode-hard-btn');
       
-      if (mode === 'NORMAL') {
-        normBtn.className = "py-2 border-2 border-cyan-400 bg-cyan-950/20 text-cyan-400 pixel-font text-[10px] rounded focus:outline-none";
-        hardBtn.className = "py-2 border-2 border-neutral-800 bg-transparent text-neutral-500 pixel-font text-[10px] rounded hover:border-red-600 hover:text-red-500 transition-colors focus:outline-none";
-      } else {
-        hardBtn.className = "py-2 border-2 border-red-600 bg-red-950/20 text-red-500 pixel-font text-[10px] rounded focus:outline-none";
-        normBtn.className = "py-2 border-2 border-neutral-800 bg-transparent text-neutral-500 pixel-font text-[10px] rounded hover:border-cyan-400 hover:text-cyan-400 transition-colors focus:outline-none";
-      }
+      const activeClass = "py-2 border-2 border-white bg-white text-black pixel-font text-[8px] sm:text-[9px] rounded-none focus:outline-none";
+      const inactiveClass = "py-2 border-2 border-neutral-700 bg-black text-neutral-400 pixel-font text-[8px] sm:text-[9px] rounded-none hover:border-white hover:text-white transition-colors focus:outline-none";
+      
+      easyBtn.className = (mode === 'EINFACH') ? activeClass : inactiveClass;
+      normBtn.className = (mode === 'NORMAL') ? activeClass : inactiveClass;
+      hardBtn.className = (mode === 'SCHWER') ? activeClass : inactiveClass;
     }
 
     function setRetroMode(active) {
@@ -741,17 +758,40 @@
         arcade.classList.remove('crt-curve');
         canvasEl.classList.remove('retro-mode');
         desc.innerText = "Modern (Antialiasing, Neon-Glühen)";
-        desc.className = "text-xs text-cyan-400 font-bold";
+        desc.className = "text-xs text-white font-bold";
       }
     }
 
     // Initialize Game Loops & Event Listeners
     window.addEventListener('keydown', e => {
       keys[e.code] = true;
-      if (['Space', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.code)) {
+      if (['Space', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Enter'].includes(e.code)) {
         e.preventDefault();
       }
       
+      // Handle key selection inside the TRANSITION select screen
+      if (gameState === 'TRANSITION') {
+        if (e.code === 'KeyA' || e.code === 'ArrowLeft') {
+          if (transitionSelect !== 0) {
+            transitionSelect = 0;
+            soundManager.playSelect();
+          }
+        }
+        if (e.code === 'KeyD' || e.code === 'ArrowRight') {
+          if (transitionSelect !== 1) {
+            transitionSelect = 1;
+            soundManager.playSelect();
+          }
+        }
+        if (e.code === 'Space' || e.code === 'Enter') {
+          if (transitionSelect === 0) {
+            startAttackSlider();
+          } else {
+            triggerHealAction();
+          }
+        }
+      }
+
       // Handle Spacebar Press in Rhythm slider
       if (e.code === 'Space' && gameState === 'SLIDER' && !slider.stopped) {
         stopSlider();
@@ -760,6 +800,12 @@
 
     window.addEventListener('keyup', e => {
       keys[e.code] = false;
+    });
+
+    document.getElementById('mode-easy-btn').addEventListener('click', () => {
+      soundManager.init();
+      soundManager.playSelect();
+      setDifficulty('EINFACH');
     });
 
     document.getElementById('mode-normal-btn').addEventListener('click', () => {
@@ -854,16 +900,24 @@
       patternTimer = 0;
       currentPattern = 0;
       
+      healCharges = 5;
+      transitionSelect = 0;
+      healAnimTimer = 0;
+      
       // Set music tempo based on mode
-      soundManager.setTempo(currentMode === 'NORMAL' ? 115 : 132);
+      if (currentMode === 'EINFACH') {
+        soundManager.setTempo(100);
+      } else if (currentMode === 'NORMAL') {
+        soundManager.setTempo(115);
+      } else {
+        soundManager.setTempo(132);
+      }
       
       // Set up random patterns sequencer
       setupPatterns();
       
       showScreen('GAME');
-      gameState = 'INTRO';
-      introState.timer = 0;
-      introState.dialogueIndex = 0;
+      gameState = 'DODGE';
       soundManager.startMusic();
     }
 
@@ -905,7 +959,7 @@
       ];
       let patId = activePatternsList[currentPattern % activePatternsList.length];
       let str = names[patId];
-      if (boss.hp < 125) {
+      if (boss.hp < 125 && currentMode !== 'EINFACH') {
         str += " // INSTABIL!";
       }
       return str;
@@ -914,68 +968,53 @@
     // --- ENEMY BULLETS / ATTACKS IMPLEMENTATIONS ---
     class Asteroid {
       constructor() {
-        // Spawn randomly outside a circle of radius 200
-        let angle = Math.random() * Math.PI * 2;
-        this.x = 300 + Math.cos(angle) * 220;
-        this.y = 350 + Math.sin(angle) * 220;
+        // Pick a target landing spot inside the current box bounds
+        let L = BOX_CENTER_X - boxWidth/2;
+        let R = BOX_CENTER_X + boxWidth/2;
+        let T = BOX_CENTER_Y - boxHeight/2;
+        let B = BOX_CENTER_Y + boxHeight/2;
         
-        // Target towards inside the box
-        let tx = BOX_CENTER_X + (Math.random() - 0.5) * 150;
-        let ty = BOX_CENTER_Y + (Math.random() - 0.5) * 150;
-        let diffX = tx - this.x;
-        let diffY = ty - this.y;
-        let dist = Math.sqrt(diffX*diffX + diffY*diffY) || 1;
+        // Target landing point (keep slightly away from extreme boundaries)
+        this.targetX = L + 20 + Math.random() * (boxWidth - 40);
+        this.targetY = T + 20 + Math.random() * (boxHeight - 40);
         
-        let baseSpeed = (currentMode === 'NORMAL') ? 2.5 : 4.0;
-        if (boss.hp < 125) baseSpeed += 0.8; // Faster in Phase 2
+        // Starting position of the falling meteor (diagonally up-left)
+        this.x = this.targetX - 120;
+        this.y = this.targetY - 240;
         
-        this.vx = (diffX / dist) * baseSpeed;
-        this.vy = (diffY / dist) * baseSpeed;
+        this.timer = 0;
+        if (currentMode === 'EINFACH') {
+          this.fallDuration = 55;
+        } else if (currentMode === 'NORMAL') {
+          this.fallDuration = 36;
+        } else {
+          this.fallDuration = 22; // Very fast on Hard
+        }
         
-        this.radius = 12 + Math.random() * 5;
+        this.radius = 14 + Math.random() * 6;
+        this.warningRadius = 24;
         this.sides = 7;
         this.offsets = [];
         for (let i = 0; i < this.sides; i++) {
           this.offsets.push(0.7 + Math.random() * 0.5);
         }
-        
-        this.hasBeenInside = false;
-        this.toRemove = false;
         this.rot = 0;
-        this.rotSpeed = (Math.random() - 0.5) * 0.05;
+        this.rotSpeed = (Math.random() - 0.5) * 0.08;
+        this.toRemove = false;
       }
 
       update(L, R, T, B) {
-        this.x += this.vx;
-        this.y += this.vy;
+        this.timer++;
         this.rot += this.rotSpeed;
+        
+        let t = this.timer / this.fallDuration;
+        if (t > 1) t = 1;
+        
+        this.x = (this.targetX - 120) + 120 * t;
+        this.y = (this.targetY - 240) + 240 * t;
 
-        // Verify if it crossed inside the bounds
-        if (this.x > L && this.x < R && this.y > T && this.y < B) {
-          this.hasBeenInside = true;
-        }
-
-        // Collision check with player
-        if (player.invincibleTime <= 0) {
-          let dist = Math.sqrt((player.x - this.x)**2 + (player.y - this.y)**2);
-          if (dist < player.hitboxRadius + this.radius * 0.8) {
-            damagePlayer(8);
-            this.explode(L, R, T, B);
-            return;
-          }
-        }
-
-        // Explode on hit with opposite wall after entering
-        if (this.hasBeenInside) {
-          if (this.x - this.radius < L || this.x + this.radius > R || 
-              this.y - this.radius < T || this.y + this.radius > B) {
-            this.explode(L, R, T, B);
-          }
-        } else {
-          // If it wanders too far without entering, clean up
-          if (Math.abs(this.x - 300) > 350 || Math.abs(this.y - 350) > 350) {
-            this.toRemove = true;
-          }
+        if (this.timer >= this.fallDuration) {
+          this.explode(L, R, T, B);
         }
       }
 
@@ -984,33 +1023,60 @@
         soundManager.playHit();
         shakeScreen(8, 12);
         
-        // Spawn shards
-        let shardCount = (currentMode === 'NORMAL') ? 3 : 5;
-        let shardSpeed = (currentMode === 'NORMAL') ? 3.0 : 4.5;
-        
-        // Reflect shards into the box
-        let baseAngle = Math.atan2(-this.vy, -this.vx);
-        for (let i = 0; i < shardCount; i++) {
-          let spread = (i - (shardCount - 1)/2) * 0.35;
-          let angle = baseAngle + spread;
-          projectiles.push(new AsteroidShard(this.x, this.y, Math.cos(angle)*shardSpeed, Math.sin(angle)*shardSpeed));
+        // Check if player is inside warning circle
+        let dist = Math.sqrt((player.x - this.targetX)**2 + (player.y - this.targetY)**2);
+        if (dist < player.hitboxRadius + this.warningRadius && player.invincibleTime <= 0) {
+          damagePlayer(12);
         }
         
-        // Small puff of smoke particles
-        spawnExplosion(this.x, this.y, '#6b7280', 6);
+        // Spawn shards radiating outwards
+        let shardCount = (currentMode === 'EINFACH') ? 2 : (currentMode === 'NORMAL' ? 4 : 6);
+        let shardSpeed = (currentMode === 'EINFACH') ? 3.0 : (currentMode === 'NORMAL' ? 4.8 : 6.8);
+        
+        let baseAngle = Math.random() * Math.PI * 2;
+        for (let i = 0; i < shardCount; i++) {
+          let angle = baseAngle + (i / shardCount) * Math.PI * 2;
+          projectiles.push(new AsteroidShard(this.targetX, this.targetY, Math.cos(angle)*shardSpeed, Math.sin(angle)*shardSpeed));
+        }
+        
+        // Smoke particles
+        spawnExplosion(this.targetX, this.targetY, '#6b7280', 8);
       }
 
       draw() {
+        // 1. Draw target landing warning circle
         ctx.save();
+        let pulse = Math.floor(gameFrame / 4) % 2 === 0;
+        ctx.strokeStyle = pulse ? '#ffffff' : '#555555';
+        ctx.lineWidth = 1.5;
+        ctx.setLineDash([4, 4]);
+        ctx.beginPath();
+        ctx.arc(this.targetX, this.targetY, this.warningRadius, 0, Math.PI*2);
+        ctx.stroke();
+        
+        ctx.fillStyle = pulse ? 'rgba(255, 255, 255, 0.2)' : 'rgba(85, 85, 85, 0.1)';
+        ctx.beginPath();
+        ctx.arc(this.targetX, this.targetY, this.warningRadius * (this.timer / this.fallDuration), 0, Math.PI*2);
+        ctx.fill();
+        ctx.restore();
+
+        // 2. Draw falling meteor (3D effect)
+        ctx.save();
+        let currentScale = 2.0 - (this.timer / this.fallDuration);
+        let opacity = 0.5 + 0.5 * (this.timer / this.fallDuration);
+        
         ctx.translate(this.x, this.y);
         ctx.rotate(this.rot);
-        ctx.strokeStyle = isRetro ? '#ffffff' : '#f87171';
-        ctx.fillStyle = '#1e1b4b';
-        ctx.lineWidth = 2;
+        ctx.scale(currentScale, currentScale);
+        ctx.globalAlpha = opacity;
+        
+        ctx.strokeStyle = '#ffffff';
+        ctx.fillStyle = '#121212';
+        ctx.lineWidth = 2 / currentScale;
         
         if (!isRetro) {
-          ctx.shadowBlur = 10;
-          ctx.shadowColor = '#f87171';
+          ctx.shadowBlur = 8;
+          ctx.shadowColor = '#ffffff';
         }
         
         ctx.beginPath();
@@ -1089,10 +1155,17 @@
         this.state = 'GLIDE'; // 'GLIDE', 'AIM', 'WARN', 'FIRE', 'FADE'
         this.timer = 0;
         this.toRemove = false;
-        this.beamWidth = (currentMode === 'NORMAL') ? 28 : 42;
+        
+        if (currentMode === 'EINFACH') {
+          this.beamWidth = 18;
+        } else if (currentMode === 'NORMAL') {
+          this.beamWidth = 28;
+        } else {
+          this.beamWidth = 42;
+        }
         
         // Phase 2 sweep angle
-        this.sweepSpeed = (boss.hp < 125) ? (Math.random() > 0.5 ? 0.006 : -0.006) : 0;
+        this.sweepSpeed = (boss.hp < 125 && currentMode !== 'EINFACH') ? (Math.random() > 0.5 ? 0.012 : -0.012) : 0;
       }
 
       update() {
@@ -1100,8 +1173,9 @@
         
         if (this.state === 'GLIDE') {
           // Linear glide to target
-          this.x += (this.tx - this.x) * 0.12;
-          this.y += (this.ty - this.y) * 0.12;
+          let glideFactor = (currentMode === 'EINFACH') ? 0.08 : ((currentMode === 'NORMAL') ? 0.18 : 0.25);
+          this.x += (this.tx - this.x) * glideFactor;
+          this.y += (this.ty - this.y) * glideFactor;
           
           // Face the player
           let dx = player.x - this.x;
@@ -1128,7 +1202,9 @@
         }
         else if (this.state === 'WARN') {
           // Warning laser setup
-          let warnLimit = (currentMode === 'NORMAL') ? 20 : 12; // Shorter warning on Hard
+          let warnLimit = 12;
+          if (currentMode === 'EINFACH') warnLimit = 25;
+          else if (currentMode === 'SCHWER') warnLimit = 7;
           if (this.timer > warnLimit) {
             this.state = 'FIRE';
             this.timer = 0;
@@ -1179,8 +1255,8 @@
         
         if (!isRetro) {
           ctx.shadowBlur = 10;
-          ctx.shadowColor = '#00fff2';
-          ctx.strokeStyle = '#00fff2';
+          ctx.shadowColor = '#ffffff';
+          ctx.strokeStyle = '#ffffff';
         }
 
         ctx.beginPath();
@@ -1200,9 +1276,9 @@
 
         // Glowing Core Eye
         if (this.state === 'WARN' || this.state === 'FIRE') {
-          ctx.fillStyle = (gameFrame % 4 < 2) ? '#ff0055' : '#ffff00';
+          ctx.fillStyle = (gameFrame % 4 < 2) ? '#ffffff' : '#888888';
         } else {
-          ctx.fillStyle = '#ef4444';
+          ctx.fillStyle = '#888888';
         }
         ctx.beginPath();
         ctx.arc(-5, -6, 3, 0, Math.PI*2);
@@ -1215,7 +1291,7 @@
         if (this.state === 'WARN') {
           // Red indicator dotted line
           ctx.save();
-          ctx.strokeStyle = '#ef4444';
+          ctx.strokeStyle = '#888888';
           ctx.lineWidth = 1;
           ctx.setLineDash([5, 5]);
           ctx.beginPath();
@@ -1239,10 +1315,10 @@
           } else {
             // High intensity glowing modern beam
             ctx.shadowBlur = 20;
-            ctx.shadowColor = '#00fff2';
+            ctx.shadowColor = '#ffffff';
             
-            // Outer cyan beam
-            ctx.strokeStyle = 'rgba(0, 255, 242, 0.9)';
+            // Outer white/grey beam
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.8)';
             ctx.lineWidth = this.beamWidth;
             ctx.beginPath();
             ctx.moveTo(this.x, this.y);
@@ -1270,7 +1346,13 @@
         this.timer = 0;
         this.toRemove = false;
         
-        this.warnDuration = (currentMode === 'NORMAL') ? 22 : 14;
+        if (currentMode === 'EINFACH') {
+          this.warnDuration = 25;
+        } else if (currentMode === 'NORMAL') {
+          this.warnDuration = 14;
+        } else {
+          this.warnDuration = 9;
+        }
         this.fireDuration = 15;
         this.width = 14;
       }
@@ -1315,7 +1397,7 @@
         if (this.timer <= this.warnDuration) {
           // Warning indicator: blinking line
           if (Math.floor(gameFrame / 3) % 2 === 0) {
-            ctx.fillStyle = 'rgba(239, 68, 68, 0.45)';
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.25)';
             if (this.type === 'H') {
               ctx.fillRect(L, py - this.width/2, R - L, this.width);
             } else {
@@ -1336,8 +1418,8 @@
             ctx.stroke();
           } else {
             ctx.shadowBlur = 15;
-            ctx.shadowColor = '#ef4444';
-            ctx.strokeStyle = '#ef4444';
+            ctx.shadowColor = '#ffffff';
+            ctx.strokeStyle = '#ffffff';
             ctx.lineWidth = this.width;
             ctx.beginPath();
             if (this.type === 'H') {
@@ -1372,9 +1454,16 @@
         
         this.warnDuration = 40;
         
-        let speedNormal = 0.014;
-        let speedHard = 0.023;
-        this.rotSpeed = (currentMode === 'NORMAL') ? speedNormal : speedHard;
+        let speedEasy = 0.010;
+        let speedNormal = 0.024;
+        let speedHard = 0.038;
+        if (currentMode === 'EINFACH') {
+          this.rotSpeed = speedEasy;
+        } else if (currentMode === 'NORMAL') {
+          this.rotSpeed = speedNormal;
+        } else {
+          this.rotSpeed = speedHard;
+        }
         
         // Reverse flag (For hard mode only)
         this.willReverse = (currentMode === 'SCHWER');
@@ -1424,7 +1513,7 @@
         ctx.save();
         if (this.timer <= this.warnDuration) {
           // Warning dotted lines
-          ctx.strokeStyle = '#f59e0b';
+          ctx.strokeStyle = '#888888';
           ctx.lineWidth = 1;
           ctx.setLineDash([6, 6]);
           ctx.beginPath();
@@ -1442,8 +1531,8 @@
             ctx.stroke();
           } else {
             ctx.shadowBlur = 12;
-            ctx.shadowColor = '#00fff2';
-            ctx.strokeStyle = '#00fff2';
+            ctx.shadowColor = '#ffffff';
+            ctx.strokeStyle = '#ffffff';
             ctx.lineWidth = 10;
             ctx.beginPath();
             ctx.moveTo(cx - Math.cos(this.angle)*len, cy - Math.sin(this.angle)*len);
@@ -1574,12 +1663,12 @@
         ctx.save();
         ctx.translate(this.x, this.y);
         ctx.rotate(this.angle);
-        ctx.strokeStyle = isRetro ? '#ffffff' : '#00fff2';
-        ctx.fillStyle = '#0f172a';
+        ctx.strokeStyle = '#ffffff';
+        ctx.fillStyle = '#121212';
         ctx.lineWidth = 2;
         if (!isRetro) {
           ctx.shadowBlur = 10;
-          ctx.shadowColor = '#00fff2';
+          ctx.shadowColor = '#ffffff';
         }
         ctx.fillRect(-this.size/2, -this.size/2, this.size, this.size);
         ctx.strokeRect(-this.size/2, -this.size/2, this.size, this.size);
@@ -1647,12 +1736,12 @@
       ctx.translate(boss.x, boss.y);
       
       // Hit flash effect
-      let col = '#00fff2';
+      let col = '#ffffff';
       if (boss.isHurt > 0) {
-        col = (gameFrame % 4 < 2) ? '#ffffff' : '#ef4444';
+        col = (gameFrame % 4 < 2) ? '#ffffff' : '#555555';
         boss.isHurt--;
-      } else if (boss.hp < 125) {
-        col = '#f43f5e'; // Phase 2 turns red core
+      } else if (boss.hp < 125 && currentMode !== 'EINFACH') {
+        col = '#a3a3a3'; // Phase 2 turns grey core
       }
 
       if (!isRetro) {
@@ -1661,8 +1750,8 @@
       }
       
       // Render floating glitch segments
-      if (gameState === 'DODGE' && boss.hp < 125 && Math.random() < 0.25) {
-        ctx.fillStyle = 'rgba(244, 63, 94, 0.4)';
+      if (gameState === 'DODGE' && boss.hp < 125 && currentMode !== 'EINFACH' && Math.random() < 0.25) {
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.25)';
         ctx.fillRect(-40 + Math.random()*20, -10 + Math.random()*20, 80, 5);
       }
       
@@ -1704,7 +1793,7 @@
       
       // Glitchy title during Phase 2
       let displayName = boss.name;
-      if (boss.hp < 125 && Math.random() < 0.15) {
+      if (boss.hp < 125 && currentMode !== 'EINFACH' && Math.random() < 0.15) {
         displayName = "N1H1L.C0R3";
       }
       ctx.fillText(displayName, boss.x, boss.y - 65);
@@ -1713,10 +1802,10 @@
       let hbWidth = 140;
       let hbX = boss.x - hbWidth/2;
       let hbY = boss.y - 52;
-      ctx.fillStyle = '#ef4444';
+      ctx.fillStyle = '#333333';
       ctx.fillRect(hbX, hbY, hbWidth, 6);
-      ctx.fillStyle = '#00fff2';
-      if (boss.hp < 125) ctx.fillStyle = '#f43f5e';
+      ctx.fillStyle = '#ffffff';
+      if (boss.hp < 125 && currentMode !== 'EINFACH') ctx.fillStyle = '#a3a3a3';
       ctx.fillRect(hbX, hbY, hbWidth * (boss.hp / boss.maxHp), 6);
       
       ctx.restore();
@@ -1792,26 +1881,28 @@
       }
 
       // 3. TRANSITION / HEAL TIMEOUT STATE
-      if (gameState === 'TRANSITION') {
-        // Simple countdown state to give player visual warning before attack starts
-        // Morph the box to small slider size
+      if (gameState === 'TRANSITION' || gameState === 'HEAL_ANIM') {
         let targetW = 260;
-        let targetH = 60;
+        let targetH = 65;
         boxWidth += (targetW - boxWidth) * 0.15;
         boxHeight += (targetH - boxHeight) * 0.15;
 
-        let Left = BOX_CENTER_X - boxWidth/2;
-        let Right = BOX_CENTER_X + boxWidth/2;
-        let Top = BOX_CENTER_Y - boxHeight/2;
-        let Bottom = BOX_CENTER_Y + boxHeight/2;
-
-        // Smoothly glide player to the center of the morphing box
-        player.x += (BOX_CENTER_X - player.x) * 0.15;
-        player.y += (BOX_CENTER_Y - player.y) * 0.15;
-        player.clampToBounds(Left, Right, Top, Bottom);
-
-        if (Math.abs(boxHeight - targetH) < 2) {
-          startAttackSlider();
+        if (gameState === 'TRANSITION') {
+          if (transitionSelect === 0) {
+            player.x = BOX_CENTER_X - boxWidth/2 + 20;
+          } else {
+            player.x = BOX_CENTER_X - boxWidth/2 + 130;
+          }
+          player.y = BOX_CENTER_Y;
+        } else if (gameState === 'HEAL_ANIM') {
+          player.x = BOX_CENTER_X - boxWidth/2 + 130;
+          player.y = BOX_CENTER_Y;
+          
+          healAnimTimer--;
+          if (healAnimTimer <= 0) {
+            currentPattern++;
+            startNextDodgingPhase();
+          }
         }
       }
 
@@ -1874,18 +1965,37 @@
     // --- RHYTHM SLIDER LOGIC ---
     function startHealingTransition() {
       gameState = 'TRANSITION';
-      
-      // Apply stage healing
-      let healAmount = (currentMode === 'NORMAL') ? 20 : 10;
-      player.hp = Math.min(player.maxHp, player.hp + healAmount);
-      
-      soundManager.playHeal();
-      addFloatingText(`+${healAmount} HP HEILUNG!`, BOX_CENTER_X, BOX_CENTER_Y - 30, '#10b981');
+      transitionSelect = 0; // Default to Angriff
       
       // Clear out residual elements
       projectiles = [];
       blasters = [];
       lasers = [];
+    }
+
+    function triggerHealAction() {
+      if (healCharges <= 0) {
+        soundManager.playBuzzer();
+        addFloatingText("KEINE LADUNGEN MEHR!", BOX_CENTER_X, BOX_CENTER_Y - 40, '#ef4444');
+        return;
+      }
+      if (player.hp >= player.maxHp) {
+        soundManager.playBuzzer();
+        addFloatingText("HP BEREITS VOLL!", BOX_CENTER_X, BOX_CENTER_Y - 40, '#ef4444');
+        return;
+      }
+      
+      let healVal = (currentMode === 'EINFACH') ? 50 : 25;
+      player.hp = Math.min(player.maxHp, player.hp + healVal);
+      healCharges--;
+      soundManager.playHeal();
+      
+      addFloatingText(`+${healVal} HP GEHEILT!`, BOX_CENTER_X, BOX_CENTER_Y - 40, '#ffffff');
+      spawnExplosion(player.x, player.y, '#ffffff', 10);
+      
+      // Trigger HEAL_ANIM state for 60 frames
+      gameState = 'HEAL_ANIM';
+      healAnimTimer = 60;
     }
 
     function startAttackSlider() {
@@ -1895,8 +2005,12 @@
       slider.stopped = false;
       slider.stopResult = '';
       
-      let baseSpeed = (currentMode === 'NORMAL') ? 3.5 : 5.0;
-      if (boss.hp < 125) baseSpeed += 1.0; // Slider speed scales in phase 2
+      let baseSpeed = 3.5;
+      if (currentMode === 'EINFACH') baseSpeed = 2.5;
+      else if (currentMode === 'NORMAL') baseSpeed = 5.2;
+      else if (currentMode === 'SCHWER') baseSpeed = 7.5;
+      
+      if (boss.hp < 125 && currentMode !== 'EINFACH') baseSpeed += 1.5;
       slider.speed = baseSpeed;
     }
 
@@ -1906,16 +2020,20 @@
       
       let dist = Math.abs(slider.indicatorX - BOX_CENTER_X);
       
-      if (dist <= 8) {
+      if (dist <= 4) {
         slider.stopResult = 'CRIT';
         stats.crits++;
         stats.combo++;
         soundManager.playSelect();
-      } else if (dist <= 26) {
+      } else if (dist <= 14) {
         slider.stopResult = 'GUT';
         stats.combo = 0;
         soundManager.playSelect();
-      } else if (dist <= 52) {
+      } else if (dist <= 32) {
+        slider.stopResult = 'NORMAL';
+        stats.combo = 0;
+        soundManager.playSelect();
+      } else if (dist <= 56) {
         slider.stopResult = 'SCHWACH';
         stats.combo = 0;
         soundManager.playSelect();
@@ -1931,23 +2049,29 @@
       let col = '#ffffff';
       
       if (slider.stopResult === 'CRIT') {
-        // Combo multiplier! CRIT damage scales
         let multiplier = 1;
-        if (stats.combo === 2) multiplier = 1.33; // 24 dmg
-        if (stats.combo >= 3) multiplier = 1.78; // 32 dmg
+        if (stats.combo === 2) multiplier = 1.33;
+        if (stats.combo >= 3) multiplier = 1.78;
         damage = Math.round(18 * multiplier);
-        col = '#eab308';
+        col = '#ffffff';
         shakeScreen(15, 8);
       } else if (slider.stopResult === 'GUT') {
-        damage = 10;
-        col = '#06b6d4';
+        damage = 12;
+        col = '#e0e0e0';
         shakeScreen(8, 4);
+      } else if (slider.stopResult === 'NORMAL') {
+        damage = 8;
+        col = '#b5b5b5';
+        shakeScreen(5, 2);
       } else if (slider.stopResult === 'SCHWACH') {
         damage = 4;
-        col = '#94a3b8';
+        col = '#888888';
       }
 
       if (damage > 0) {
+        if (currentMode === 'EINFACH') {
+          damage = Math.round(damage * 1.5);
+        }
         boss.hp = Math.max(0, boss.hp - damage);
         boss.isHurt = 15;
         soundManager.playHit();
@@ -1959,7 +2083,7 @@
         }
         addFloatingText(label, boss.x, boss.y - 20, col);
       } else {
-        addFloatingText("FEHLSCHLAG!", boss.x, boss.y - 20, '#ef4444');
+        addFloatingText("FEHLSCHLAG!", boss.x, boss.y - 20, '#888888');
       }
 
       if (boss.hp <= 0) {
@@ -1982,7 +2106,7 @@
       lasers = [];
 
       // Check for phase transitions
-      if (boss.hp < 125) {
+      if (boss.hp < 125 && currentMode !== 'EINFACH') {
         soundManager.setTempo(144); // Speed up music loop in Phase 2
       }
     }
@@ -2022,7 +2146,7 @@
           if (keys['KeyD'] || keys['ArrowRight']) player.vx = player.speed;
           
           // Jump logic
-          if ((keys['KeyW'] || keys['ArrowUp']) && player.y + player.radius >= Bottom - 2) {
+          if ((keys['KeyW'] || keys['ArrowUp']) && player.y + player.radius >= B - 2) {
             player.vy = player.jumpForce;
             soundManager.playJump();
           }
@@ -2031,8 +2155,8 @@
           player.y += player.vy;
 
           // Boundary clamp with ground checks
-          if (player.y + player.radius >= Bottom) {
-            player.y = Bottom - player.radius;
+          if (player.y + player.radius >= B) {
+            player.y = B - player.radius;
             player.vy = 0;
             player.onGround = true;
           }
@@ -2044,7 +2168,7 @@
           if (keys['KeyA'] || keys['ArrowLeft']) player.vx = -player.speed;
           if (keys['KeyD'] || keys['ArrowRight']) player.vx = player.speed;
           
-          if ((keys['KeyS'] || keys['ArrowDown']) && player.y - player.radius <= Top + 2) {
+          if ((keys['KeyS'] || keys['ArrowDown']) && player.y - player.radius <= T + 2) {
             player.vy = -player.jumpForce; // jump downwards
             soundManager.playJump();
           }
@@ -2052,8 +2176,8 @@
           player.x += player.vx;
           player.y += player.vy;
 
-          if (player.y - player.radius <= Top) {
-            player.y = Top + player.radius;
+          if (player.y - player.radius <= T) {
+            player.y = T + player.radius;
             player.vy = 0;
             player.onGround = true;
           }
@@ -2114,13 +2238,13 @@
       document.getElementById('hud-stage').innerText = `MODUS: ${currentMode} // ANGRIFF: ${getActivePatternName()}`;
 
       // Ultimate combination attack overrides in Phase 2
-      let isPhase2 = (boss.hp < 125);
+      let isPhase2 = (boss.hp < 125 && currentMode !== 'EINFACH');
       
       if (isPhase2) {
         // Trigger screen siren
         if (patternTimer === 1) {
           soundManager.playSiren();
-          addFloatingText("ACHTUNG: ULTIMATE-ANGRIFF!", BOX_CENTER_X, BOX_CENTER_Y - 60, '#f43f5e');
+          addFloatingText("ACHTUNG: ULTIMATE-ANGRIFF!", BOX_CENTER_X, BOX_CENTER_Y - 60, '#ffffff');
         }
         
         // Spawn Phase 2 combined asteroid shards continuously
@@ -2131,12 +2255,15 @@
 
       switch(patId) {
         case 0: // GRID LASER SPAM
-          // Spawn warning grids at intervals
-          let gridInterval = (currentMode === 'NORMAL') ? 60 : 40;
-          if (isPhase2) gridInterval = 32;
+          let gridInterval = 40;
+          if (currentMode === 'EINFACH') gridInterval = 70;
+          else if (currentMode === 'SCHWER') gridInterval = 25;
+          if (isPhase2) gridInterval = Math.round(gridInterval * 0.7);
 
           if (patternTimer % gridInterval === 0 && patternTimer < PATTERN_DURATION - 80) {
-            let numLasers = (currentMode === 'NORMAL') ? 2 : 4;
+            let numLasers = 4;
+            if (currentMode === 'EINFACH') numLasers = 2;
+            else if (currentMode === 'NORMAL') numLasers = 3;
             for (let i = 0; i < numLasers; i++) {
               let type = (Math.random() > 0.5) ? 'H' : 'V';
               let pos = Math.floor(Math.random() * 5);
@@ -2152,8 +2279,10 @@
           break;
           
         case 2: // PROZEDURAL GASTER BLASTER
-          let blasterInterval = (currentMode === 'NORMAL') ? 70 : 45;
-          if (isPhase2) blasterInterval = 32;
+          let blasterInterval = 45;
+          if (currentMode === 'EINFACH') blasterInterval = 85;
+          else if (currentMode === 'SCHWER') blasterInterval = 28;
+          if (isPhase2) blasterInterval = Math.round(blasterInterval * 0.7);
 
           if (patternTimer % blasterInterval === 0 && patternTimer < PATTERN_DURATION - 90) {
             blasters.push(new GasterBlaster());
@@ -2167,22 +2296,30 @@
           break;
           
         case 3: // ASTEROID IMPACT
-          let asteroidInterval = (currentMode === 'NORMAL') ? 50 : 35;
+          let asteroidInterval = 35;
+          if (currentMode === 'EINFACH') asteroidInterval = 65;
+          else if (currentMode === 'SCHWER') asteroidInterval = 22;
           if (patternTimer % asteroidInterval === 0 && patternTimer < PATTERN_DURATION - 80) {
             projectiles.push(new Asteroid());
           }
           break;
           
         case 4: // KÄSTCHEN PROJECTILE CLUSTER
-          let swarmInterval = (currentMode === 'NORMAL') ? 35 : 22;
+          let swarmInterval = 22;
+          if (currentMode === 'EINFACH') swarmInterval = 45;
+          else if (currentMode === 'SCHWER') swarmInterval = 14;
           if (patternTimer % swarmInterval === 0 && patternTimer < PATTERN_DURATION - 60) {
             // Spawn swarm along random outer edge
             let edge = Math.floor(Math.random() * 4);
-            let bulletCount = (currentMode === 'NORMAL') ? 4 : 7;
+            let bulletCount = 5;
+            if (currentMode === 'EINFACH') bulletCount = 3;
+            else if (currentMode === 'SCHWER') bulletCount = 7;
             
             for (let i = 0; i < bulletCount; i++) {
               let bx, by;
-              let speed = (currentMode === 'NORMAL') ? 2.5 : 3.8;
+              let speed = 3.8;
+              if (currentMode === 'EINFACH') speed = 2.0;
+              else if (currentMode === 'SCHWER') speed = 5.5;
               
               if (edge === 0) { // Top edge
                 bx = L + (R - L) * i / (bulletCount - 1);
@@ -2202,7 +2339,7 @@
               let dy = player.y - by;
               let len = Math.sqrt(dx*dx + dy*dy) || 1;
               
-              let b = new GenericBullet('square', bx, by, (dx/len)*speed, (dy/len)*speed, '#38bdf8');
+              let b = new GenericBullet('square', bx, by, (dx/len)*speed, (dy/len)*speed, '#ffffff');
               
               // Homing functionality in hard mode
               if (currentMode === 'SCHWER') {
@@ -2214,37 +2351,49 @@
           break;
           
         case 5: // GRAVITY SCHWANKUNG (Platformer test)
-          player.gravityDir = 'BOTTOM'; // Standard platformer starts
+          if (patternTimer === 1) {
+            player.gravityDir = 'BOTTOM'; // Standard platformer starts on first frame
+          }
           
-          let shiftInterval = (currentMode === 'NORMAL') ? 200 : 120;
+          let shiftInterval = 120;
+          if (currentMode === 'EINFACH') shiftInterval = 220;
+          else if (currentMode === 'SCHWER') shiftInterval = 80;
           if (patternTimer % shiftInterval === 0 && patternTimer < PATTERN_DURATION - 50) {
             // Pick random gravity axis
             const dirs = ['TOP', 'BOTTOM', 'LEFT', 'RIGHT'];
             let nextDir = dirs[Math.floor(Math.random()*dirs.length)];
             player.gravityDir = nextDir;
-            addFloatingText(`GRAVITATION: ${nextDir}!`, BOX_CENTER_X, BOX_CENTER_Y - 40, '#ff0055');
+            addFloatingText(`GRAVITATION: ${nextDir}!`, BOX_CENTER_X, BOX_CENTER_Y - 40, '#ffffff');
             soundManager.playBuzzer();
             shakeScreen(10, 5);
           }
 
           // Spawn hurdles to jump over
-          if (patternTimer % 60 === 0 && patternTimer < PATTERN_DURATION - 60) {
+          let wallStarRate = 35;
+          if (currentMode === 'EINFACH') wallStarRate = 60;
+          else if (currentMode === 'SCHWER') wallStarRate = 22;
+          
+          if (patternTimer % wallStarRate === 0 && patternTimer < PATTERN_DURATION - 60) {
             // Bullet wave crossing based on gravity axis
-            let speed = (currentMode === 'NORMAL') ? 2.0 : 3.0;
+            let speed = 3.5;
+            if (currentMode === 'EINFACH') speed = 2.0;
+            else if (currentMode === 'SCHWER') speed = 5.0;
             if (player.gravityDir === 'BOTTOM' || player.gravityDir === 'TOP') {
               // Horizontal sweeping wall stars
-              projectiles.push(new GenericBullet('star', L - 10, Bottom - 12, speed, 0, '#ec4899'));
+              projectiles.push(new GenericBullet('star', L - 10, B - 12, speed, 0, '#d1d5db'));
             } else {
               // Vertical sweeping wall stars
-              projectiles.push(new GenericBullet('star', L + 12, T - 10, 0, speed, '#ec4899'));
+              projectiles.push(new GenericBullet('star', L + 12, T - 10, 0, speed, '#d1d5db'));
             }
           }
           break;
           
         case 6: // SCHWARZES LOCH ORBIT
           // Vortex attraction
-          let pull = (currentMode === 'NORMAL') ? 0.52 : 0.88;
-          if (isPhase2) pull += 0.2;
+          let pull = 0.85;
+          if (currentMode === 'EINFACH') pull = 0.4;
+          else if (currentMode === 'SCHWER') pull = 1.35;
+          if (isPhase2) pull += 0.35;
           
           let dx = BOX_CENTER_X - player.x;
           let dy = BOX_CENTER_Y - player.y;
@@ -2261,55 +2410,70 @@
           }
           
           // Spawn bullets outwards from the center of the vortex
-          let bulletSpawnRate = (currentMode === 'NORMAL') ? 40 : 25;
+          let bulletSpawnRate = 25;
+          if (currentMode === 'EINFACH') bulletSpawnRate = 50;
+          else if (currentMode === 'SCHWER') bulletSpawnRate = 15;
           if (patternTimer % bulletSpawnRate === 0 && patternTimer < PATTERN_DURATION - 50) {
             let bulletCount = (currentMode === 'NORMAL') ? 4 : 7;
+            if (currentMode === 'EINFACH') bulletCount = 3;
             let offset = Math.random() * Math.PI;
             for (let i = 0; i < bulletCount; i++) {
               let angle = (i / bulletCount) * Math.PI * 2 + offset;
-              let speed = 2.0;
-              projectiles.push(new GenericBullet('bubble', BOX_CENTER_X, BOX_CENTER_Y, Math.cos(angle)*speed, Math.sin(angle)*speed, '#a855f7'));
+              let speed = 3.5;
+              if (currentMode === 'EINFACH') speed = 2.0;
+              else if (currentMode === 'SCHWER') speed = 4.5;
+              projectiles.push(new GenericBullet('bubble', BOX_CENTER_X, BOX_CENTER_Y, Math.cos(angle)*speed, Math.sin(angle)*speed, '#9ca3af'));
             }
           }
           break;
           
         case 7: // HELIX WAVE CROSSING
-          let helixRate = (currentMode === 'NORMAL') ? 14 : 9;
+          let helixRate = 9;
+          if (currentMode === 'EINFACH') helixRate = 18;
+          else if (currentMode === 'SCHWER') helixRate = 6;
           if (patternTimer % helixRate === 0 && patternTimer < PATTERN_DURATION - 50) {
-            let speed = 2.2;
+            let speed = 3.8;
+            if (currentMode === 'EINFACH') speed = 2.0;
+            else if (currentMode === 'SCHWER') speed = 4.8;
             let amp = (currentMode === 'NORMAL') ? 45 : 65;
             let freq = 0.05;
             
             // Left to right wave
             let y1 = BOX_CENTER_Y + Math.sin(patternTimer * freq) * amp;
-            projectiles.push(new GenericBullet('star', L - 10, y1, speed, 0, '#eab308'));
+            projectiles.push(new GenericBullet('star', L - 10, y1, speed, 0, '#d1d5db'));
             
             // Right to left wave (Only on Hard Mode)
             if (currentMode === 'SCHWER') {
               let y2 = BOX_CENTER_Y + Math.cos(patternTimer * freq) * amp;
-              projectiles.push(new GenericBullet('star', R + 10, y2, -speed, 0, '#ef4444'));
+              projectiles.push(new GenericBullet('star', R + 10, y2, -speed, 0, '#d1d5db'));
             }
           }
           break;
 
         case 8: // DIGITAL GLITCH STORM
-          if (patternTimer % 60 === 0 && patternTimer < PATTERN_DURATION - 80) {
+          let glitchRate = 35;
+          if (currentMode === 'EINFACH') glitchRate = 60;
+          else if (currentMode === 'SCHWER') glitchRate = 25;
+          
+          if (patternTimer % glitchRate === 0 && patternTimer < PATTERN_DURATION - 80) {
             shakeScreen(20, 8);
             soundManager.playBuzzer();
             
             // Trigger color inversion flash
             if (isRetro) {
-              addFloatingText("FEHLERHAFTES RASTER!", BOX_CENTER_X, BOX_CENTER_Y - 50, '#ef4444');
+              addFloatingText("FEHLERHAFTES RASTER!", BOX_CENTER_X, BOX_CENTER_Y - 50, '#ffffff');
             }
             
             let row = Math.floor(Math.random()*4);
-            let speed = (currentMode === 'NORMAL') ? 3.0 : 4.5;
+            let speed = 5.0;
+            if (currentMode === 'EINFACH') speed = 2.8;
+            else if (currentMode === 'SCHWER') speed = 7.5;
             
             // Spawn row of fast horizontal boxes
             for (let i = 0; i < 5; i++) {
               let bx = L - 15 - (i * 20);
               let by = T + 40 + row * 45;
-              projectiles.push(new GenericBullet('square', bx, by, speed, 0, '#10b981'));
+              projectiles.push(new GenericBullet('square', bx, by, speed, 0, '#ffffff'));
             }
           }
           break;
@@ -2319,7 +2483,7 @@
     // --- RENDER SYSTEM ---
     function renderGame() {
       // Clear with Inversion color handling
-      let isInverted = (gameState === 'DODGE' && boss.hp < 125 && Math.floor(gameFrame / 30) % 2 === 0);
+      let isInverted = (gameState === 'DODGE' && boss.hp < 125 && currentMode !== 'EINFACH' && Math.floor(gameFrame / 30) % 2 === 0);
       
       // Apply screen shake
       ctx.save();
@@ -2360,7 +2524,7 @@
           ctx.fillText(showText, 100, 280);
         }
 
-        ctx.fillStyle = '#00fff2';
+        ctx.fillStyle = '#ffffff';
         if (Math.floor(gameFrame / 15) % 2 === 0) {
           ctx.fillText("[ SPACE ] WEITER", 200, 380);
         }
@@ -2382,8 +2546,8 @@
       // Modern mode neon neon arena borders
       if (!isRetro && !isInverted) {
         ctx.shadowBlur = 10;
-        ctx.shadowColor = (boss.hp < 125) ? '#f43f5e' : '#00fff2';
-        ctx.strokeStyle = (boss.hp < 125) ? '#f43f5e' : '#00fff2';
+        ctx.shadowColor = '#ffffff';
+        ctx.strokeStyle = '#ffffff';
       }
       ctx.lineWidth = 4;
       ctx.strokeRect(L, T, boxWidth, boxHeight);
@@ -2395,7 +2559,7 @@
         ctx.save();
         ctx.translate(BOX_CENTER_X, BOX_CENTER_Y);
         ctx.rotate(gameFrame * 0.05);
-        ctx.strokeStyle = isRetro ? '#ffffff' : 'rgba(168, 85, 247, 0.4)';
+        ctx.strokeStyle = isRetro ? '#ffffff' : 'rgba(255, 255, 255, 0.4)';
         ctx.lineWidth = 1.5;
         
         // Draw orbital spiral lines
@@ -2413,20 +2577,36 @@
       }
 
       // 3. Draw game entities
-      if (gameState === 'DODGE') {
+      if (gameState === 'DODGE' || gameState === 'TRANSITION' || gameState === 'HEAL_ANIM') {
         // Render grid lines below bullets
-        lasers.forEach(laser => laser.draw(L, R, T, B));
-        
-        // Render bullets & asteroids
-        projectiles.forEach(bullet => bullet.draw());
-        blasters.forEach(blaster => blaster.draw());
+        if (gameState === 'DODGE') {
+          lasers.forEach(laser => laser.draw(L, R, T, B));
+          projectiles.forEach(bullet => bullet.draw());
+          blasters.forEach(blaster => blaster.draw());
+        }
 
         // Draw Player Heart
         let heartCol = (player.invincibleTime > 0 && Math.floor(gameFrame / 4) % 2 === 0) ? 'rgba(239, 68, 68, 0.3)' : '#ef4444';
         
-        // Display exact 1-pixel hitbox in modern style
         let showDot = !isRetro;
         drawHeart(player.x, player.y, 16, 16, heartCol, showDot);
+      }
+
+      // Draw choice menu options in TRANSITION / HEAL_ANIM state
+      if (gameState === 'TRANSITION' || gameState === 'HEAL_ANIM') {
+        ctx.save();
+        ctx.fillStyle = '#ffffff';
+        ctx.font = "9px 'Press Start 2P'";
+        ctx.textAlign = 'left';
+        
+        let textY = BOX_CENTER_Y + 3;
+        
+        ctx.fillText("ANGRIFF", L + 32, textY);
+        
+        let healColor = (healCharges > 0) ? '#ffffff' : '#555555';
+        ctx.fillStyle = healColor;
+        ctx.fillText(`HEILUNG (${healCharges}/5)`, L + 142, textY);
+        ctx.restore();
       }
 
       // 4. Draw Rhythm Slider HUD
@@ -2434,11 +2614,11 @@
         ctx.save();
         
         // Target vertical center highlight
-        ctx.fillStyle = isRetro ? 'rgba(255,255,255,0.2)' : 'rgba(0,255,242,0.15)';
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.15)';
         ctx.fillRect(BOX_CENTER_X - 12, T + 4, 24, boxHeight - 8);
 
         // Core Target Line
-        ctx.strokeStyle = isRetro ? '#ffffff' : '#00fff2';
+        ctx.strokeStyle = '#ffffff';
         ctx.lineWidth = 3;
         ctx.beginPath();
         ctx.moveTo(BOX_CENTER_X, T + 4);
@@ -2466,10 +2646,11 @@
             
             let label = slider.stopResult;
             let col = '#ffffff';
-            if (label === 'CRIT') col = '#eab308';
-            if (label === 'GUT') col = '#06b6d4';
-            if (label === 'SCHWACH') col = '#94a3b8';
-            if (label === 'MISS') col = '#ef4444';
+            if (label === 'CRIT') col = '#ffffff';
+            else if (label === 'GUT') col = '#e0e0e0';
+            else if (label === 'NORMAL') col = '#b5b5b5';
+            else if (label === 'SCHWACH') col = '#888888';
+            else if (label === 'MISS') col = '#555555';
             
             ctx.fillStyle = col;
             ctx.fillText(label, BOX_CENTER_X, T - 18);
@@ -2503,25 +2684,23 @@
 
       // Draw Player HUD under box
       ctx.save();
+      let hudX = 170;
       let hudY = 512;
       ctx.fillStyle = '#ffffff';
       ctx.font = "11px 'Press Start 2P'";
       ctx.textAlign = 'left';
-      ctx.fillText("AG.SOUL   LV 19", L, hudY);
+      ctx.fillText("AG.SOUL   LV 19", hudX, hudY);
       
       // HP Bar block
       let barWidth = 110;
       let barHeight = 12;
-      let barX = L + 130;
+      let barX = hudX + 130;
       let barY = hudY - 10;
       
-      ctx.fillStyle = '#b91c1c'; // Red background
+      ctx.fillStyle = '#333333'; // Dark grey background
       ctx.fillRect(barX, barY, barWidth, barHeight);
       
-      ctx.fillStyle = '#ef4444'; // Yellow-Red main health
-      if (!isRetro) {
-        ctx.fillStyle = '#f43f5e';
-      }
+      ctx.fillStyle = '#ef4444'; // Red main health fill
       let fillW = barWidth * (player.hp / player.maxHp);
       ctx.fillRect(barX, barY, fillW, barHeight);
       
