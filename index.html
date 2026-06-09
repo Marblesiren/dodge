@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>WHITE_ROOM.EXE: ANTIGRAVITY 2.0</title>
+  <title>WHITE_ROOM.EXE</title>
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Google Fonts for Retro Pixel & Cyberpunk Look -->
@@ -94,6 +94,17 @@
       background-color: #121212;
       border-color: #ffffff;
     }
+
+    /* Dynamic scaling and viewport centering */
+    #arcade-cabinet {
+      width: 100%;
+      max-width: min(95vw, 75vh) !important;
+    }
+    #gameCanvas {
+      width: 100% !important;
+      height: auto !important;
+      aspect-ratio: 1 / 1;
+    }
   </style>
 </head>
 <body class="h-screen w-screen flex items-center justify-center">
@@ -113,7 +124,7 @@
   </svg>
 
   <!-- Main Arcade Frame -->
-  <div id="arcade-cabinet" class="w-full max-w-2xl bg-black border-4 border-white rounded-none p-4 flex flex-col items-center relative crt-container modern-neon-glow transition-all duration-300">
+  <div id="arcade-cabinet" class="w-full bg-black border-4 border-white rounded-none p-4 flex flex-col items-center relative crt-container modern-neon-glow transition-all duration-300">
     
     <!-- Screen Scanlines & Vignette (Toggled by Retro State) -->
     <div id="crt-overlay" class="absolute inset-0 scanlines crt-flicker pointer-events-none z-10 rounded-none"></div>
@@ -125,13 +136,13 @@
         <span class="w-3 h-3 bg-white rounded-none animate-pulse"></span>
         <h1 class="pixel-font text-xs tracking-wider text-white">WHITE_ROOM.EXE</h1>
       </div>
-      <div class="text-xs text-neutral-400 font-mono tracking-widest">v2.0 // ANTIGRAVITY</div>
+      <div class="text-xs text-neutral-400 font-mono tracking-widest">v2.0 // WHITE_ROOM</div>
     </div>
 
     <!-- 1. MAIN MENU SCREEN -->
     <div id="menu-screen" class="w-full flex flex-col items-center justify-center py-6 px-4 z-20 transition-all duration-300">
       <h2 class="pixel-font text-xl md:text-2xl text-center text-white mb-6 tracking-tighter leading-relaxed retro-text-shadow">
-        WHITE_ROOM.EXE:<br>ANTIGRAVITY 2.0
+        WHITE_ROOM.EXE
       </h2>
       
       <p class="text-center text-sm max-w-md text-white mb-8 border-2 border-white p-4 bg-neutral-950/50 rounded-none leading-relaxed">
@@ -140,6 +151,19 @@
 
       <!-- Options Box -->
       <div class="w-full max-w-sm space-y-6 mb-8">
+        <!-- Boss Selector (No Box Layout) -->
+        <div id="boss-selector-container" class="w-full flex flex-col items-center select-none mb-4">
+          <label class="block text-xs uppercase text-neutral-400 mb-1 font-bold tracking-wider text-center">GEGNER PROTOKOLL (BOSS WÄHLEN):</label>
+          <div id="boss-display" class="pixel-font text-sm text-white tracking-widest text-center mt-1">STICKMAN</div>
+          <div id="boss-desc" class="text-[11px] text-neutral-500 mt-1 mb-2 text-center h-8 font-mono max-w-[280px]">"Ein agiler, riesiger Skizzen-Krieger. Kopf über der Box, Hände an den Seiten."</div>
+          
+          <div class="flex items-center justify-between w-full mt-2 px-1">
+            <button id="boss-prev-btn" class="px-3 py-4 border border-white hover:bg-white hover:text-black pixel-font text-xs focus:outline-none">&lt;</button>
+            <canvas id="bossPreviewCanvas" width="300" height="200" class="block pixelated"></canvas>
+            <button id="boss-next-btn" class="px-3 py-4 border border-white hover:bg-white hover:text-black pixel-font text-xs focus:outline-none">&gt;</button>
+          </div>
+        </div>
+
         <!-- Mode Select -->
         <div>
           <label class="block text-xs uppercase text-neutral-400 mb-2 font-bold tracking-wider">Militärisches Protokoll (Schwierigkeit):</label>
@@ -189,8 +213,8 @@
       </div>
       
       <!-- HTML5 Canvas -->
-      <div class="relative bg-black border-2 border-white rounded-none">
-        <canvas id="gameCanvas" width="600" height="600" class="block w-[300px] h-[300px] sm:w-[500px] sm:h-[500px] md:w-[600px] md:h-[600px] pixelated"></canvas>
+      <div class="relative bg-black border-2 border-white rounded-none w-full">
+        <canvas id="gameCanvas" width="600" height="600" class="block pixelated"></canvas>
       </div>
       
       <!-- In-Game Hint -->
@@ -204,7 +228,7 @@
       <h2 class="pixel-font text-white text-lg md:text-xl text-center mb-6 tracking-wider animate-pulse">
         VERBINDUNG VERLOREN.<br>SYSTEM ABGESTÜRZT.
       </h2>
-      <p class="text-center text-sm text-neutral-400 mb-8 max-w-sm">
+      <p id="death-desc" class="text-center text-sm text-neutral-400 mb-8 max-w-sm">
         Deine Seele wurde durch NIHIL.CORE zerschmettert.<br>
         Der weiße Raum toleriert keine Fehler.
       </p>
@@ -223,10 +247,10 @@
 
     <!-- 4. VICTORY SCREEN -->
     <div id="victory-screen" class="hidden w-full flex flex-col items-center justify-center py-12 px-4 z-20 transition-all duration-300">
-      <h2 class="pixel-font text-white text-lg md:text-xl text-center mb-6 tracking-widest animate-bounce">
+      <h2 id="victory-title" class="pixel-font text-white text-lg md:text-xl text-center mb-6 tracking-widest animate-bounce">
         NIHIL.CORE GEKNACKT.<br>WHITE_ROOM BEFREIT!
       </h2>
-      <p class="text-center text-sm text-neutral-300 mb-8 max-w-sm">
+      <p id="victory-desc" class="text-center text-sm text-neutral-300 mb-8 max-w-sm">
         Du hast das Unmögliche überlebt und die Antigravitations-Barriere überwunden. Die Simulation kollabiert.
       </p>
 
@@ -258,285 +282,21 @@
         this.tempo = 120;
         this.currentBeat = 0;
         this.isPlayingMusic = false;
-        
-        // Eerie minor progression bass notes (MIDI pitch values)
-        this.bassNotes = [36, 36, 39, 39, 41, 41, 43, 43, 41, 41, 39, 39, 38, 38, 37, 37]; 
-        
-        // Melodic arpeggio patterns
-        this.melodyNotes = [
-          [60, 63, 67, 72], // C minor arp
-          [60, 63, 67, 72],
-          [62, 65, 69, 74], // D minor arp
-          [63, 67, 70, 75], // Eb major arp
-        ];
+        this.bassNotes = [];
+        this.melodyNotes = [];
       }
-
-      init() {
-        if (this.ctx) return;
-        const AudioContext = window.AudioContext || window.webkitAudioContext;
-        this.ctx = new AudioContext();
-        
-        // Volumes setup
-        this.masterVolume = this.ctx.createGain();
-        this.masterVolume.gain.setValueAtTime(0.35, this.ctx.currentTime);
-        this.masterVolume.connect(this.ctx.destination);
-        
-        this.synthVolume = this.ctx.createGain();
-        this.synthVolume.gain.setValueAtTime(0.8, this.ctx.currentTime);
-        this.synthVolume.connect(this.masterVolume);
-        
-        this.musicVolume = this.ctx.createGain();
-        this.musicVolume.gain.setValueAtTime(0.35, this.ctx.currentTime);
-        this.musicVolume.connect(this.masterVolume);
-      }
-
-      playSelect() {
-        if (!this.ctx) return;
-        let osc = this.ctx.createOscillator();
-        let gain = this.ctx.createGain();
-        osc.connect(gain);
-        gain.connect(this.synthVolume);
-        
-        osc.type = 'square';
-        osc.frequency.setValueAtTime(500, this.ctx.currentTime);
-        osc.frequency.exponentialRampToValueAtTime(900, this.ctx.currentTime + 0.08);
-        
-        gain.gain.setValueAtTime(0.15, this.ctx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.08);
-        
-        osc.start();
-        osc.stop(this.ctx.currentTime + 0.08);
-      }
-
-      playJump() {
-        if (!this.ctx) return;
-        let osc = this.ctx.createOscillator();
-        let gain = this.ctx.createGain();
-        osc.connect(gain);
-        gain.connect(this.synthVolume);
-        
-        osc.type = 'triangle';
-        osc.frequency.setValueAtTime(220, this.ctx.currentTime);
-        osc.frequency.exponentialRampToValueAtTime(580, this.ctx.currentTime + 0.12);
-        
-        gain.gain.setValueAtTime(0.25, this.ctx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.12);
-        
-        osc.start();
-        osc.stop(this.ctx.currentTime + 0.12);
-      }
-
-      playHit() {
-        if (!this.ctx) return;
-        // White noise explosion burst
-        let bufferSize = this.ctx.sampleRate * 0.15;
-        let buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
-        let data = buffer.getChannelData(0);
-        for (let i = 0; i < bufferSize; i++) {
-          data[i] = Math.random() * 2 - 1;
-        }
-        
-        let noiseSource = this.ctx.createBufferSource();
-        noiseSource.buffer = buffer;
-        
-        let filter = this.ctx.createBiquadFilter();
-        filter.type = 'lowpass';
-        filter.frequency.setValueAtTime(350, this.ctx.currentTime);
-        
-        let gain = this.ctx.createGain();
-        gain.gain.setValueAtTime(0.7, this.ctx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.15);
-        
-        noiseSource.connect(filter);
-        filter.connect(gain);
-        gain.connect(this.synthVolume);
-        
-        noiseSource.start();
-        noiseSource.stop(this.ctx.currentTime + 0.15);
-      }
-
-      playLaser() {
-        if (!this.ctx) return;
-        let osc = this.ctx.createOscillator();
-        let gain = this.ctx.createGain();
-        osc.connect(gain);
-        gain.connect(this.synthVolume);
-        
-        osc.type = 'sawtooth';
-        osc.frequency.setValueAtTime(750, this.ctx.currentTime);
-        osc.frequency.exponentialRampToValueAtTime(80, this.ctx.currentTime + 0.22);
-        
-        gain.gain.setValueAtTime(0.2, this.ctx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.22);
-        
-        osc.start();
-        osc.stop(this.ctx.currentTime + 0.22);
-      }
-
-      playHeal() {
-        if (!this.ctx) return;
-        let now = this.ctx.currentTime;
-        let notes = [55, 60, 64, 67, 72]; // C Major chord scale up
-        notes.forEach((note, index) => {
-          let osc = this.ctx.createOscillator();
-          let gain = this.ctx.createGain();
-          osc.connect(gain);
-          gain.connect(this.synthVolume);
-          
-          osc.type = 'sine';
-          let freq = 440 * Math.pow(2, (note - 69) / 12);
-          osc.frequency.setValueAtTime(freq, now + index * 0.04);
-          
-          gain.gain.setValueAtTime(0, now);
-          gain.gain.linearRampToValueAtTime(0.2, now + index * 0.04 + 0.01);
-          gain.gain.exponentialRampToValueAtTime(0.01, now + index * 0.04 + 0.18);
-          
-          osc.start(now + index * 0.04);
-          osc.stop(now + index * 0.04 + 0.18);
-        });
-      }
-
-      playBuzzer() {
-        if (!this.ctx) return;
-        let osc = this.ctx.createOscillator();
-        let gain = this.ctx.createGain();
-        osc.connect(gain);
-        gain.connect(this.synthVolume);
-        
-        osc.type = 'sawtooth';
-        osc.frequency.setValueAtTime(95, this.ctx.currentTime);
-        osc.frequency.setValueAtTime(90, this.ctx.currentTime + 0.12);
-        
-        gain.gain.setValueAtTime(0.35, this.ctx.currentTime);
-        gain.gain.linearRampToValueAtTime(0.35, this.ctx.currentTime + 0.2);
-        gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.22);
-        
-        osc.start();
-        osc.stop(this.ctx.currentTime + 0.22);
-      }
-
-      playSiren() {
-        if (!this.ctx) return;
-        let osc = this.ctx.createOscillator();
-        let gain = this.ctx.createGain();
-        osc.connect(gain);
-        gain.connect(this.synthVolume);
-        
-        osc.type = 'sawtooth';
-        osc.frequency.setValueAtTime(180, this.ctx.currentTime);
-        osc.frequency.linearRampToValueAtTime(380, this.ctx.currentTime + 0.25);
-        osc.frequency.linearRampToValueAtTime(180, this.ctx.currentTime + 0.5);
-        
-        gain.gain.setValueAtTime(0.25, this.ctx.currentTime);
-        gain.gain.linearRampToValueAtTime(0.25, this.ctx.currentTime + 0.45);
-        gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.5);
-        
-        osc.start();
-        osc.stop(this.ctx.currentTime + 0.5);
-      }
-
-      startMusic() {
-        if (this.isPlayingMusic) return;
-        this.isPlayingMusic = true;
-        this.currentBeat = 0;
-        
-        const scheduleAheadTime = 0.12;
-        let nextNoteTime = this.ctx.currentTime;
-        
-        this.musicInterval = setInterval(() => {
-          while (nextNoteTime < this.ctx.currentTime + scheduleAheadTime) {
-            this.scheduleBeat(this.currentBeat, nextNoteTime);
-            nextNoteTime += 60.0 / this.tempo / 2; // eighth notes
-            this.currentBeat++;
-          }
-        }, 30);
-      }
-
-      stopMusic() {
-        if (!this.isPlayingMusic) return;
-        clearInterval(this.musicInterval);
-        this.isPlayingMusic = false;
-      }
-
-      setTempo(t) {
-        this.tempo = t;
-      }
-
-      scheduleBeat(beat, time) {
-        // Core Drums
-        let isKick = beat % 8 === 0 || beat % 8 === 4;
-        let isSnare = beat % 8 === 2 || beat % 8 === 6;
-        
-        if (isKick) {
-          let osc = this.ctx.createOscillator();
-          let gain = this.ctx.createGain();
-          osc.connect(gain);
-          gain.connect(this.musicVolume);
-          osc.frequency.setValueAtTime(130, time);
-          osc.frequency.exponentialRampToValueAtTime(35, time + 0.1);
-          gain.gain.setValueAtTime(0.4, time);
-          gain.gain.exponentialRampToValueAtTime(0.01, time + 0.11);
-          osc.start(time);
-          osc.stop(time + 0.11);
-        }
-        
-        if (isSnare) {
-          let bufferSize = this.ctx.sampleRate * 0.08;
-          let buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
-          let data = buffer.getChannelData(0);
-          for (let i = 0; i < bufferSize; i++) {
-            data[i] = Math.random() * 2 - 1;
-          }
-          let source = this.ctx.createBufferSource();
-          source.buffer = buffer;
-          let gain = this.ctx.createGain();
-          gain.gain.setValueAtTime(0.2, time);
-          gain.gain.exponentialRampToValueAtTime(0.01, time + 0.08);
-          source.connect(gain);
-          gain.connect(this.musicVolume);
-          source.start(time);
-          source.stop(time + 0.08);
-        }
-
-        // Bass Tracker Line
-        let bassIndex = beat % this.bassNotes.length;
-        let bassMidi = this.bassNotes[bassIndex];
-        let bassFreq = 440 * Math.pow(2, (bassMidi - 69) / 12);
-        
-        let bassOsc = this.ctx.createOscillator();
-        let bassGain = this.ctx.createGain();
-        bassOsc.connect(bassGain);
-        bassGain.connect(this.musicVolume);
-        
-        bassOsc.type = 'triangle';
-        bassOsc.frequency.setValueAtTime(bassFreq, time);
-        
-        bassGain.gain.setValueAtTime(0.3, time);
-        bassGain.gain.exponentialRampToValueAtTime(0.01, time + 0.18);
-        
-        bassOsc.start(time);
-        bassOsc.stop(time + 0.18);
-        
-        // Fast tense Lead Arpeggio
-        let chordIndex = Math.floor(beat / 16) % this.melodyNotes.length;
-        let chord = this.melodyNotes[chordIndex];
-        let noteInChord = chord[beat % 4];
-        
-        let melOsc = this.ctx.createOscillator();
-        let melGain = this.ctx.createGain();
-        melOsc.connect(melGain);
-        melGain.connect(this.musicVolume);
-        
-        melOsc.type = 'square';
-        let melFreq = 440 * Math.pow(2, (noteInChord - 69) / 12);
-        melOsc.frequency.setValueAtTime(melFreq, time);
-        
-        melGain.gain.setValueAtTime(0.12, time);
-        melGain.gain.exponentialRampToValueAtTime(0.01, time + 0.14);
-        
-        melOsc.start(time);
-        melOsc.stop(time + 0.14);
-      }
+      init() {}
+      playSelect() {}
+      playJump() {}
+      playHit() {}
+      playLaser() {}
+      playHeal() {}
+      playBuzzer() {}
+      playSiren() {}
+      startMusic() {}
+      stopMusic() {}
+      setTempo(t) {}
+      scheduleBeat(beat, time) {}
     }
 
     const soundManager = new SoundManager();
@@ -558,8 +318,38 @@
     // Game State variables
     let currentMode = 'NORMAL'; // 'NORMAL' or 'SCHWER'
     let isRetro = true;
-    let gameState = 'MENU'; // 'MENU', 'INTRO', 'DODGE', 'SLIDER', 'TRANSITION', 'GAMEOVER', 'VICTORY'
+    let gameState = 'MENU'; // 'MENU', 'INTRO', 'DODGE', 'SLIDER', 'TRANSITION', 'GAMEOVER', 'VICTORY', 'DEFEAT_ANIM'
+    let defeatTimer = 0;
     let gameFrame = 0;
+    
+    // Boss selection configurations
+    let currentBossType = 'STICKMAN'; // 'STICKMAN' or 'NIHIL'
+    let selectedBossIndex = 0; // 0 = STICKMAN, 1 = NIHIL
+    const bossesConfig = [
+      { name: "PUNKT (I)", desc: "Ein einsamer Riesenpixel. Wächst mit jeder Phase. Schießt langsamen Pixel-Regen." },
+      { name: "GLITCH (II)", desc: "Ein glitschender Code-Fehler. Schießt fehlerhafte Projektile und Laser-Störfeuer." },
+      { name: "GUMMI (III)", desc: "Ein bröckelnder Vektor-Radierer. Schrumpft das Spielfeld und wirft Krümel." },
+      { name: "MR. STICKMAN (VI)", desc: "Ein agiler, riesiger Skizzen-Krieger. Kopf über der Box, Hände an den Seiten." },
+      { name: "NIHIL.CORE (X)", desc: "Der weiße Raum-Kern. Instabile Quantengeometrie und Bullet-Hell." }
+    ];
+    let stickmanEntities = [];
+    let handPunch = {
+      active: false,
+      hand: 'left',
+      timer: 0,
+      startX: 0,
+      startY: 0,
+      targetX: 0,
+      targetY: 0,
+      warnDuration: 30,
+      duration: 45
+    };
+    let handClap = {
+      active: false,
+      timer: 0,
+      warnDuration: 40,
+      duration: 55
+    };
     
     // Selection menu and heal charges
     let transitionSelect = 0; // 0 = Angriff, 1 = Heilung
@@ -620,9 +410,9 @@
 
     // Boss statistics
     let boss = {
-      name: 'NIHIL.CORE',
-      hp: 250,
-      maxHp: 250,
+      name: 'MR. STICKMAN',
+      hp: 180,
+      maxHp: 180,
       x: 300,
       y: 100,
       pulse: 0,
@@ -630,7 +420,27 @@
       isHurt: 0,
       
       reset() {
-        this.hp = 250;
+        if (currentBossType === 'STICKMAN') {
+          this.name = 'MR. STICKMAN (VI)';
+          this.hp = 180;
+          this.maxHp = 180;
+        } else if (currentBossType === 'NIHIL') {
+          this.name = 'NIHIL.CORE (X)';
+          this.hp = 250;
+          this.maxHp = 250;
+        } else if (currentBossType === 'GLITCH') {
+          this.name = 'GLITCH (II)';
+          this.hp = 100;
+          this.maxHp = 100;
+        } else if (currentBossType === 'GUMMI') {
+          this.name = 'GUMMI (III)';
+          this.hp = 120;
+          this.maxHp = 120;
+        } else if (currentBossType === 'PUNKT') {
+          this.name = 'PUNKT (I)';
+          this.hp = 80;
+          this.maxHp = 80;
+        }
         this.isHurt = 0;
       }
     };
@@ -706,7 +516,7 @@
       }
     }
 
-    function addFloatingText(text, x, y, color) {
+    function addFloatingText(text, x, y, color, fontSize = 8) {
       textAlerts.push({
         text: text,
         x: x,
@@ -714,7 +524,8 @@
         vy: -0.8,
         opacity: 1,
         life: 50,
-        color: color
+        color: color,
+        fontSize: fontSize
       });
     }
 
@@ -791,9 +602,8 @@
           }
         }
       }
-
       // Handle Spacebar Press in Rhythm slider
-      if (e.code === 'Space' && gameState === 'SLIDER' && !slider.stopped) {
+      else if (e.code === 'Space' && gameState === 'SLIDER' && !slider.stopped) {
         stopSlider();
       }
     });
@@ -842,6 +652,60 @@
       showScreen('MENU');
     });
 
+    document.getElementById('boss-prev-btn').addEventListener('click', (e) => {
+      e.stopPropagation();
+      soundManager.init();
+      soundManager.playSelect();
+      selectedBossIndex = (selectedBossIndex - 1 + bossesConfig.length) % bossesConfig.length;
+      updateBossSelectionHUD();
+    });
+
+    document.getElementById('boss-next-btn').addEventListener('click', (e) => {
+      e.stopPropagation();
+      soundManager.init();
+      soundManager.playSelect();
+      selectedBossIndex = (selectedBossIndex + 1) % bossesConfig.length;
+      updateBossSelectionHUD();
+    });
+
+    // Swipe detection for boss selection
+    let touchStartX = 0;
+    let touchEndX = 0;
+    const bossSelectPanel = document.getElementById('boss-selector-container');
+    
+    bossSelectPanel.addEventListener('touchstart', e => {
+      touchStartX = e.changedTouches[0].screenX;
+    }, { passive: true });
+    
+    bossSelectPanel.addEventListener('touchend', e => {
+      touchEndX = e.changedTouches[0].screenX;
+      handleSwipe();
+    }, { passive: true });
+    
+    function handleSwipe() {
+      let threshold = 50;
+      if (touchEndX < touchStartX - threshold) {
+        soundManager.init();
+        soundManager.playSelect();
+        selectedBossIndex = (selectedBossIndex + 1) % bossesConfig.length;
+        updateBossSelectionHUD();
+      }
+      if (touchEndX > touchStartX + threshold) {
+        soundManager.init();
+        soundManager.playSelect();
+        selectedBossIndex = (selectedBossIndex - 1 + bossesConfig.length) % bossesConfig.length;
+        updateBossSelectionHUD();
+      }
+    }
+
+    function updateBossSelectionHUD() {
+      const b = bossesConfig[selectedBossIndex];
+      document.getElementById('boss-display').innerText = b.name;
+      document.getElementById('boss-desc').innerText = `"${b.desc}"`;
+    }
+    
+    updateBossSelectionHUD();
+
     function showScreen(screen) {
       document.getElementById('menu-screen').classList.add('hidden');
       document.getElementById('game-screen').classList.add('hidden');
@@ -860,14 +724,24 @@
         soundManager.stopMusic();
         soundManager.playBuzzer();
         
+        const bossDeathName = boss.name || currentBossType;
+        document.getElementById('death-desc').innerHTML = `Deine Seele wurde durch ${bossDeathName} zerschmettert.<br>Der weiße Raum toleriert keine Fehler.`;
+        
         document.getElementById('dump-time').innerText = new Date().toLocaleTimeString();
-        document.getElementById('dump-phase').innerText = (boss.hp < 125) ? "PHASE 2 (Giga-Glitch)" : "PHASE 1 (Sperrzone)";
-        document.getElementById('dump-damage').innerText = 250 - boss.hp;
+        let phaseLabel = "PHASE 1 (Aufwärmen)";
+        if (boss.hp < (boss.maxHp / 4) && currentMode === 'SCHWER') phaseLabel = "PHASE 3 (KRISE!)";
+        else if (boss.hp < (boss.maxHp / 2)) phaseLabel = "PHASE 2 (Verstärkung)";
+        document.getElementById('dump-phase').innerText = phaseLabel;
+        document.getElementById('dump-damage').innerText = boss.maxHp - boss.hp;
       } else if (screen === 'VICTORY') {
         document.getElementById('victory-screen').classList.remove('hidden');
         gameState = 'VICTORY';
         soundManager.stopMusic();
         soundManager.playHeal();
+        
+        const bossVictoryName = boss.name || currentBossType;
+        document.getElementById('victory-title').innerHTML = `${bossVictoryName} GEKNACKT.<br>WHITE_ROOM BEFREIT!`;
+        document.getElementById('victory-desc').innerText = `Du hast ${bossVictoryName} besiegt und die Antigravitations-Barriere überwunden. Die Simulation kollabiert.`;
         
         let timeElapsed = ((Date.now() - stats.startTime) / 1000).toFixed(1);
         document.getElementById('stat-mode').innerText = currentMode;
@@ -879,6 +753,12 @@
     }
 
     function startGame() {
+      if (selectedBossIndex === 0) currentBossType = 'PUNKT';
+      else if (selectedBossIndex === 1) currentBossType = 'GLITCH';
+      else if (selectedBossIndex === 2) currentBossType = 'GUMMI';
+      else if (selectedBossIndex === 3) currentBossType = 'STICKMAN';
+      else if (selectedBossIndex === 4) currentBossType = 'NIHIL';
+      
       player.reset(currentMode);
       boss.reset();
       
@@ -886,8 +766,12 @@
       projectiles = [];
       blasters = [];
       lasers = [];
+      stickmanEntities = [];
       particleExplosions = [];
       textAlerts = [];
+      
+      handPunch.active = false;
+      handClap.active = false;
       
       stats.crits = 0;
       stats.hitsTaken = 0;
@@ -933,8 +817,17 @@
     };
 
     function setupPatterns() {
-      // Shuffled arrays of patterns
-      activePatternsList = [0, 1, 2, 3, 4, 5, 6, 7, 8];
+      if (currentBossType === 'GLITCH' || currentBossType === 'GUMMI' || currentBossType === 'PUNKT') {
+        // In SCHWER mode, add pattern 3 (Phase 3 special attack)
+        if (currentMode === 'SCHWER') {
+          activePatternsList = [0, 1, 2, 3];
+        } else {
+          activePatternsList = [0, 1, 2];
+        }
+      } else {
+        // Shuffled arrays of patterns
+        activePatternsList = [0, 1, 2, 3, 4, 5, 6, 7, 8];
+      }
       shuffleArray(activePatternsList);
     }
 
@@ -946,20 +839,55 @@
     }
 
     function getActivePatternName() {
-      const names = [
+      const nihilNames = [
         "GRID LASER SPAM",
         "ZEIGER CLOCK LASER",
         "PROZEDURAL GASTER BLASTER",
         "ASTEROIDENEINSCHLAG",
         "KÄSTCHEN PROJECTILE CLUSTER",
-        "GRAVITY SCHWANKUNG",
+        "STERNEN-SCHAUER",
         "SCHWARZES LOCH ORBIT",
         "HELIX WAVE CROSSING",
         "DIGITAL GLITCH STORM"
       ];
+      const stickmanNames = [
+        "STICKMAN-SCHWARM",
+        "PISTOLEN-DUELL",
+        "RIESEN-FAUSTSCHLAG",
+        "HELIKOPTER-ANGRIFF",
+        "VÖLKERBALL-CHAOS",
+        "HÄNDE-KLATSCHEN",
+        "TINTEN-KLECSE",
+        "SPEERWERFER-ANGRIFF",
+        "BLEISTIFT-GEKRITZEL"
+      ];
+      const glitchNames = [
+        "LAGGENDE SPLITTER",
+        "FEHLERHAFTER RASTER",
+        "AUSNAHME-FLUT",
+        "BINAR-STURM!!!"
+      ];
+      const gummiNames = [
+        "WISCH-REINIGUNG",
+        "GUMMI-KRÜMEL",
+        "BOX-KOMPRESSION",
+        "DOPPEL-WISCHER!!!"
+      ];
+      const punktNames = [
+        "PIXEL-STAUB",
+        "EXPANSION",
+        "PIXEL-STRAHL",
+        "PIXEL-ERUPTION!!!"
+      ];
       let patId = activePatternsList[currentPattern % activePatternsList.length];
-      let str = names[patId];
-      if (boss.hp < 125 && currentMode !== 'EINFACH') {
+      let str = "";
+      if (currentBossType === 'STICKMAN') str = stickmanNames[patId];
+      else if (currentBossType === 'NIHIL') str = nihilNames[patId];
+      else if (currentBossType === 'GLITCH') str = glitchNames[patId];
+      else if (currentBossType === 'GUMMI') str = gummiNames[patId];
+      else if (currentBossType === 'PUNKT') str = punktNames[patId];
+      
+      if (boss.hp < (boss.maxHp / 2) && currentMode !== 'EINFACH') {
         str += " // INSTABIL!";
       }
       return str;
@@ -1127,10 +1055,10 @@
 
       draw() {
         ctx.save();
-        ctx.fillStyle = isRetro ? '#ffffff' : '#ef4444';
+        ctx.fillStyle = '#ffffff';
         if (!isRetro) {
           ctx.shadowBlur = 8;
-          ctx.shadowColor = '#ef4444';
+          ctx.shadowColor = '#ffffff';
         }
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.radius, 0, Math.PI*2);
@@ -1157,11 +1085,11 @@
         this.toRemove = false;
         
         if (currentMode === 'EINFACH') {
-          this.beamWidth = 18;
+          this.beamWidth = 16;
         } else if (currentMode === 'NORMAL') {
-          this.beamWidth = 28;
+          this.beamWidth = 24;
         } else {
-          this.beamWidth = 42;
+          this.beamWidth = 32;
         }
         
         // Phase 2 sweep angle
@@ -1202,9 +1130,9 @@
         }
         else if (this.state === 'WARN') {
           // Warning laser setup
-          let warnLimit = 12;
-          if (currentMode === 'EINFACH') warnLimit = 25;
-          else if (currentMode === 'SCHWER') warnLimit = 7;
+          let warnLimit = 22;
+          if (currentMode === 'EINFACH') warnLimit = 35;
+          else if (currentMode === 'SCHWER') warnLimit = 15;
           if (this.timer > warnLimit) {
             this.state = 'FIRE';
             this.timer = 0;
@@ -1224,7 +1152,7 @@
             
             let distToPlayer = pointToSegmentDistance(player.x, player.y, this.x, this.y, endX, endY);
             if (distToPlayer < player.hitboxRadius + this.beamWidth / 2) {
-              damagePlayer(8);
+              damagePlayer(6);
             }
           }
           
@@ -1347,11 +1275,11 @@
         this.toRemove = false;
         
         if (currentMode === 'EINFACH') {
-          this.warnDuration = 25;
+          this.warnDuration = 45;
         } else if (currentMode === 'NORMAL') {
-          this.warnDuration = 14;
+          this.warnDuration = 30;
         } else {
-          this.warnDuration = 9;
+          this.warnDuration = 20;
         }
         this.fireDuration = 15;
         this.width = 14;
@@ -1374,11 +1302,11 @@
           if (player.invincibleTime <= 0) {
             if (this.type === 'H') {
               if (Math.abs(player.y - py) < player.hitboxRadius + this.width/2) {
-                damagePlayer(8);
+                damagePlayer(5);
               }
             } else {
               if (Math.abs(player.x - px) < player.hitboxRadius + this.width/2) {
-                damagePlayer(8);
+                damagePlayer(5);
               }
             }
           }
@@ -1394,6 +1322,31 @@
         let px = L + (R - L) * (this.pos + 1) / 6;
         
         ctx.save();
+        
+        // If Stickman boss, draw small stickman firing unit at the end of the warning line!
+        if (currentBossType === 'STICKMAN') {
+          ctx.strokeStyle = '#ffffff';
+          ctx.lineWidth = 1.5;
+          let sx = (this.type === 'H') ? L - 10 : px;
+          let sy = (this.type === 'H') ? py : T - 10;
+          ctx.beginPath();
+          ctx.arc(sx, sy - 6, 3, 0, Math.PI*2);
+          ctx.stroke();
+          ctx.beginPath();
+          ctx.moveTo(sx, sy - 3);
+          ctx.lineTo(sx, sy + 4);
+          ctx.stroke();
+          ctx.beginPath();
+          if (this.type === 'H') {
+            ctx.moveTo(sx, sy);
+            ctx.lineTo(sx + 8, sy);
+          } else {
+            ctx.moveTo(sx, sy);
+            ctx.lineTo(sx, sy + 8);
+          }
+          ctx.stroke();
+        }
+        
         if (this.timer <= this.warnDuration) {
           // Warning indicator: blinking line
           if (Math.floor(gameFrame / 3) % 2 === 0) {
@@ -1589,43 +1542,95 @@
         // Collision Check
         let dist = Math.sqrt((player.x - this.x)**2 + (player.y - this.y)**2);
         if (dist < player.hitboxRadius + this.radius) {
-          damagePlayer(5);
+          damagePlayer(this.type === 'star' ? 3 : 5);
           this.toRemove = true;
         }
 
-        // Bound checks (deleted 25px outside box)
-        if (this.x < L - 25 || this.x > R + 25 || this.y < T - 25 || this.y > B + 25) {
+        // Bound checks (deleted 150px outside box)
+        if (this.x < L - 150 || this.x > R + 150 || this.y < T - 150 || this.y > B + 150) {
           this.toRemove = true;
         }
       }
 
       draw() {
         ctx.save();
-        ctx.fillStyle = isRetro ? '#ffffff' : this.color;
-        if (!isRetro) {
-          ctx.shadowBlur = 8;
-          ctx.shadowColor = this.color;
-        }
-
-        if (this.type === 'square') {
-          ctx.fillRect(this.x - this.radius, this.y - this.radius, this.radius*2, this.radius*2);
-        } else if (this.type === 'star') {
-          // Draw standard cross star
-          ctx.beginPath();
-          ctx.moveTo(this.x, this.y - this.radius - 2);
-          ctx.lineTo(this.x + 2, this.y - 2);
-          ctx.lineTo(this.x + this.radius + 2, this.y);
-          ctx.lineTo(this.x + 2, this.y + 2);
-          ctx.lineTo(this.x, this.y + this.radius + 2);
-          ctx.lineTo(this.x - 2, this.y + 2);
-          ctx.lineTo(this.x - this.radius - 2, this.y);
-          ctx.lineTo(this.x - 2, this.y - 2);
-          ctx.closePath();
-          ctx.fill();
+        
+        if (currentBossType === 'STICKMAN') {
+          ctx.strokeStyle = '#ffffff';
+          ctx.lineWidth = 1.5;
+          ctx.fillStyle = '#ffffff';
+          if (!isRetro) {
+            ctx.shadowBlur = 6;
+            ctx.shadowColor = '#ffffff';
+          }
+          
+          if (this.type === 'square') {
+            ctx.fillRect(this.x - this.radius, this.y - this.radius, this.radius*2, this.radius*2);
+            ctx.strokeRect(this.x - this.radius, this.y - this.radius, this.radius*2, this.radius*2);
+          } else if (this.type === 'star') {
+            // Draw small jumping/running stick figure outline
+            ctx.beginPath();
+            ctx.arc(this.x, this.y - 4, 3, 0, Math.PI*2);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(this.x, this.y - 1);
+            ctx.lineTo(this.x, this.y + 4);
+            ctx.stroke();
+            let phase = (gameFrame / 6) % 2 === 0;
+            ctx.beginPath();
+            ctx.moveTo(this.x, this.y + 4);
+            ctx.lineTo(this.x - (phase ? 4 : 2), this.y + 10);
+            ctx.moveTo(this.x, this.y + 4);
+            ctx.lineTo(this.x + (phase ? 4 : 2), this.y + 10);
+            ctx.stroke();
+          } else if (this.type === 'pistol_bullet') {
+            let angle = Math.atan2(this.vy, this.vx);
+            ctx.save();
+            ctx.translate(this.x, this.y);
+            ctx.rotate(angle);
+            ctx.beginPath();
+            ctx.moveTo(-5, -2.5);
+            ctx.lineTo(0, -2.5);
+            ctx.lineTo(4, 0);
+            ctx.lineTo(0, 2.5);
+            ctx.lineTo(-5, 2.5);
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
+            ctx.restore();
+          } else { // 'bubble' or 'ink_drop' or others
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.radius, 0, Math.PI*2);
+            ctx.fill();
+            ctx.stroke();
+          }
         } else {
-          ctx.beginPath();
-          ctx.arc(this.x, this.y, this.radius, 0, Math.PI*2);
-          ctx.fill();
+          // Nihil.CORE: solid filled shapes
+          ctx.fillStyle = isRetro ? '#ffffff' : this.color;
+          if (!isRetro) {
+            ctx.shadowBlur = 8;
+            ctx.shadowColor = this.color;
+          }
+
+          if (this.type === 'square') {
+            ctx.fillRect(this.x - this.radius, this.y - this.radius, this.radius*2, this.radius*2);
+          } else if (this.type === 'star') {
+            ctx.beginPath();
+            ctx.moveTo(this.x, this.y - this.radius - 2);
+            ctx.lineTo(this.x + 2, this.y - 2);
+            ctx.lineTo(this.x + this.radius + 2, this.y);
+            ctx.lineTo(this.x + 2, this.y + 2);
+            ctx.lineTo(this.x, this.y + this.radius + 2);
+            ctx.lineTo(this.x - 2, this.y + 2);
+            ctx.lineTo(this.x - this.radius - 2, this.y);
+            ctx.lineTo(this.x - 2, this.y - 2);
+            ctx.closePath();
+            ctx.fill();
+          } else {
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.radius, 0, Math.PI*2);
+            ctx.fill();
+          }
         }
         ctx.restore();
       }
@@ -1672,6 +1677,1705 @@
         }
         ctx.fillRect(-this.size/2, -this.size/2, this.size, this.size);
         ctx.strokeRect(-this.size/2, -this.size/2, this.size, this.size);
+        ctx.restore();
+      }
+    }
+
+    // --- STICKMAN BOSS CLASSES & HELPERS ---
+    class StickmanRunner {
+      constructor(L, R, T, B) {
+        this.type = Math.random() > 0.5 ? 'bottom' : 'top';
+        this.x = (Math.random() > 0.5) ? L - 20 : R + 20;
+        this.vx = (this.x < L) ? (1.5 + Math.random()*2) : -(1.5 + Math.random()*2);
+        if (currentMode === 'SCHWER') this.vx *= 1.4;
+        this.y = (this.type === 'bottom') ? B - 20 : T + 20;
+        this.width = 12;
+        this.height = 20;
+        this.toRemove = false;
+        this.animFrame = 0;
+      }
+      update(L, R, T, B) {
+        this.x += this.vx;
+        this.animFrame += 0.2;
+        
+        let dist = Math.sqrt((player.x - this.x)**2 + (player.y - this.y)**2);
+        if (dist < player.hitboxRadius + 10 && player.invincibleTime <= 0) {
+          damagePlayer(5);
+          this.toRemove = true;
+        }
+        
+        if (this.x < L - 50 || this.x > R + 50) {
+          this.toRemove = true;
+        }
+      }
+      draw() {
+        ctx.save();
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 1.5;
+        
+        let headY = this.y - 6;
+        let bodyY = this.y + 4;
+        
+        ctx.beginPath();
+        ctx.arc(this.x, headY, 3, 0, Math.PI*2);
+        ctx.stroke();
+        
+        ctx.beginPath();
+        ctx.moveTo(this.x, headY + 3);
+        ctx.lineTo(this.x, bodyY);
+        ctx.stroke();
+        
+        let legOffset = Math.sin(this.animFrame) * 5;
+        ctx.beginPath();
+        ctx.moveTo(this.x, bodyY);
+        ctx.lineTo(this.x - 3 + legOffset, this.y + 10);
+        ctx.moveTo(this.x, bodyY);
+        ctx.lineTo(this.x + 3 - legOffset, this.y + 10);
+        ctx.stroke();
+        
+        ctx.beginPath();
+        ctx.moveTo(this.x, headY + 5);
+        ctx.lineTo(this.x - 4 - legOffset, headY + 9);
+        ctx.moveTo(this.x, headY + 5);
+        ctx.lineTo(this.x + 4 + legOffset, headY + 9);
+        ctx.stroke();
+        
+        ctx.restore();
+      }
+    }
+
+    class PistolStickman {
+      constructor(L, R, T, B) {
+        let edge = Math.floor(Math.random()*4);
+        if (edge === 0) {
+          this.x = L - 25;
+          this.y = T + 20 + Math.random()*(boxHeight - 40);
+          this.angle = 0;
+        } else if (edge === 1) {
+          this.x = R + 25;
+          this.y = T + 20 + Math.random()*(boxHeight - 40);
+          this.angle = Math.PI;
+        } else if (edge === 2) {
+          this.x = L + 20 + Math.random()*(boxWidth - 40);
+          this.y = T - 25;
+          this.angle = Math.PI/2;
+        } else {
+          this.x = L + 20 + Math.random()*(boxWidth - 40);
+          this.y = B + 25;
+          this.angle = -Math.PI/2;
+        }
+        
+        this.timer = 0;
+        this.state = 'AIM';
+        this.bulletsFired = 0;
+        this.toRemove = false;
+        this.targetAngle = 0;
+      }
+      update(L, R, T, B) {
+        this.timer++;
+        
+        let dx = player.x - this.x;
+        let dy = player.y - this.y;
+        this.targetAngle = Math.atan2(dy, dx);
+        
+        if (this.state === 'AIM') {
+          if (this.timer > 30) {
+            this.state = 'SHOOT';
+            this.timer = 0;
+          }
+        }
+        else if (this.state === 'SHOOT') {
+          if (this.timer % 8 === 0) {
+            let speed = 4.5;
+            if (currentMode === 'SCHWER') speed = 6.0;
+            projectiles.push(new GenericBullet('pistol_bullet', this.x + Math.cos(this.targetAngle)*15, this.y + Math.sin(this.targetAngle)*15, Math.cos(this.targetAngle)*speed, Math.sin(this.targetAngle)*speed, '#ffffff'));
+            this.bulletsFired++;
+            soundManager.playLaser();
+            shakeScreen(4, 2);
+            if (this.bulletsFired >= 3) {
+              this.state = 'FADE';
+              this.timer = 0;
+            }
+          }
+        }
+        else if (this.state === 'FADE') {
+          if (this.timer > 20) {
+            this.toRemove = true;
+          }
+        }
+      }
+      draw() {
+        ctx.save();
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 2;
+        
+        ctx.beginPath();
+        ctx.arc(this.x, this.y - 10, 6, 0, Math.PI*2);
+        ctx.stroke();
+        
+        ctx.beginPath();
+        ctx.moveTo(this.x, this.y - 4);
+        ctx.lineTo(this.x, this.y + 10);
+        ctx.stroke();
+        
+        ctx.beginPath();
+        ctx.moveTo(this.x, this.y + 10);
+        ctx.lineTo(this.x - 6, this.y + 20);
+        ctx.moveTo(this.x, this.y + 10);
+        ctx.lineTo(this.x + 6, this.y + 20);
+        ctx.stroke();
+        
+        let armEndX = this.x + Math.cos(this.targetAngle) * 14;
+        let armEndY = this.y + Math.sin(this.targetAngle) * 14;
+        ctx.beginPath();
+        ctx.moveTo(this.x, this.y + 2);
+        ctx.lineTo(armEndX, armEndY);
+        ctx.stroke();
+        
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(armEndX - 2, armEndY - 2, 4, 4);
+        ctx.fillRect(armEndX + Math.cos(this.targetAngle)*2 - 1, armEndY + Math.sin(this.targetAngle)*2 - 1, 3, 3);
+        
+        if (this.state === 'AIM') {
+          ctx.save();
+          ctx.strokeStyle = (Math.floor(gameFrame / 4) % 2 === 0) ? '#ffffff' : '#888888';
+          ctx.lineWidth = 1.5;
+          ctx.setLineDash([]);
+          
+          let rx = player.x;
+          let ry = player.y;
+          
+          ctx.beginPath();
+          ctx.arc(rx, ry, 10, 0, Math.PI*2);
+          ctx.stroke();
+          
+          ctx.beginPath();
+          ctx.moveTo(rx - 14, ry);
+          ctx.lineTo(rx - 6, ry);
+          ctx.moveTo(rx + 6, ry);
+          ctx.lineTo(rx + 14, ry);
+          ctx.moveTo(rx, ry - 14);
+          ctx.lineTo(rx, ry - 6);
+          ctx.moveTo(rx, ry + 6);
+          ctx.lineTo(rx, ry + 14);
+          ctx.stroke();
+          ctx.restore();
+        }
+        
+        ctx.restore();
+      }
+    }
+
+    class GiantPunch {
+      constructor(L, R, T, B) {
+        this.type = Math.random() > 0.5 ? 'H' : 'V';
+        this.timer = 0;
+        this.toRemove = false;
+        
+        this.warnDuration = (currentMode === 'EINFACH') ? 45 : ((currentMode === 'NORMAL') ? 30 : 20);
+        this.punchDuration = 20;
+        this.width = 60;
+        
+        if (this.type === 'H') {
+          this.y = (Math.random() > 0.5) ? T + 50 : B - 50;
+          this.x = L;
+        } else {
+          this.x = (Math.random() > 0.5) ? L + 50 : R - 50;
+          this.y = T;
+        }
+      }
+      update(L, R, T, B) {
+        this.timer++;
+        
+        if (this.timer > this.warnDuration && this.timer <= this.warnDuration + this.punchDuration) {
+          if (this.timer === this.warnDuration + 1) {
+            soundManager.playHit();
+            shakeScreen(15, 8);
+          }
+          
+          if (player.invincibleTime <= 0) {
+            if (this.type === 'H') {
+              if (Math.abs(player.y - this.y) < player.hitboxRadius + this.width/2) {
+                damagePlayer(12);
+              }
+            } else {
+              if (Math.abs(player.x - this.x) < player.hitboxRadius + this.width/2) {
+                damagePlayer(12);
+              }
+            }
+          }
+        }
+        
+        if (this.timer > this.warnDuration + this.punchDuration) {
+          this.toRemove = true;
+        }
+      }
+      draw(L, R, T, B) {
+        ctx.save();
+        if (this.timer <= this.warnDuration) {
+          if (Math.floor(gameFrame / 4) % 2 === 0) {
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
+            if (this.type === 'H') {
+              ctx.fillRect(L, this.y - this.width/2, R - L, this.width);
+            } else {
+              ctx.fillRect(this.x - this.width/2, T, this.width, B - T);
+            }
+          }
+        } else {
+          let progress = (this.timer - this.warnDuration) / this.punchDuration;
+          ctx.strokeStyle = '#ffffff';
+          ctx.lineWidth = 3;
+          
+          let handSize = 24;
+          if (this.type === 'H') {
+            let px = L + (R - L) * progress;
+            ctx.beginPath();
+            ctx.moveTo(L, this.y);
+            ctx.lineTo(px, this.y);
+            ctx.stroke();
+            
+            drawSketchedHand(ctx, px, this.y, handSize, Math.PI / 2, false, true);
+          } else {
+            let py = T + (B - T) * progress;
+            ctx.beginPath();
+            ctx.moveTo(this.x, T);
+            ctx.lineTo(this.x, py);
+            ctx.stroke();
+            
+            drawSketchedHand(ctx, this.x, py, handSize, Math.PI, false, true);
+          }
+        }
+        ctx.restore();
+      }
+    }
+
+    class HeliStickman {
+      constructor(L, R, T, B) {
+        this.x = L + 30 + Math.random()*(boxWidth - 60);
+        this.y = T - 20;
+        this.vy = 1.2 + Math.random()*1.2;
+        if (currentMode === 'SCHWER') this.vy *= 1.4;
+        this.startX = this.x;
+        this.swayFreq = 0.05 + Math.random()*0.05;
+        this.swayAmp = 20 + Math.random()*20;
+        this.bladeAngle = 0;
+        this.radius = 8;
+        this.toRemove = false;
+      }
+      update(L, R, T, B) {
+        this.y += this.vy;
+        this.x = this.startX + Math.sin(this.y * this.swayFreq) * this.swayAmp;
+        this.bladeAngle += 0.5;
+        
+        let dist = Math.sqrt((player.x - this.x)**2 + (player.y - this.y)**2);
+        if (dist < player.hitboxRadius + this.radius && player.invincibleTime <= 0) {
+          damagePlayer(5);
+          this.toRemove = true;
+        }
+        
+        if (this.y > B + 20) {
+          this.toRemove = true;
+        }
+      }
+      draw() {
+        ctx.save();
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 1.5;
+        
+        ctx.beginPath();
+        ctx.arc(this.x, this.y - 4, 3, 0, Math.PI*2);
+        ctx.stroke();
+        
+        ctx.beginPath();
+        ctx.moveTo(this.x, this.y - 1);
+        ctx.lineTo(this.x, this.y + 6);
+        ctx.stroke();
+        
+        let bx = Math.cos(this.bladeAngle) * 10;
+        let by = Math.sin(this.bladeAngle) * 2;
+        ctx.beginPath();
+        ctx.moveTo(this.x - bx, this.y - 9 - by);
+        ctx.lineTo(this.x + bx, this.y - 9 + by);
+        ctx.stroke();
+        
+        ctx.beginPath();
+        ctx.moveTo(this.x, this.y - 7);
+        ctx.lineTo(this.x, this.y - 9);
+        ctx.stroke();
+        
+        ctx.beginPath();
+        ctx.moveTo(this.x, this.y + 6);
+        ctx.lineTo(this.x - 3, this.y + 12);
+        ctx.moveTo(this.x, this.y + 6);
+        ctx.lineTo(this.x + 3, this.y + 12);
+        ctx.stroke();
+        
+        ctx.restore();
+      }
+    }
+    
+    class StickmanDodgeball {
+      constructor(L, R, T, B) {
+        this.x = (Math.random() > 0.5) ? L + 15 : R - 15;
+        this.y = T + 15;
+        
+        let angle = Math.PI / 4 + Math.random() * (Math.PI / 4);
+        let speed = (currentMode === 'EINFACH') ? 2.5 : ((currentMode === 'NORMAL') ? 4.2 : 5.8);
+        this.vx = (this.x < BOX_CENTER_X) ? Math.cos(angle) * speed : -Math.cos(angle) * speed;
+        this.vy = Math.sin(angle) * speed;
+        
+        this.radius = 11;
+        this.bounces = 0;
+        this.maxBounces = (currentMode === 'EINFACH') ? 3 : ((currentMode === 'NORMAL') ? 5 : 7);
+        this.toRemove = false;
+      }
+      
+      update(L, R, T, B) {
+        this.x += this.vx;
+        this.y += this.vy;
+        
+        if (this.x - this.radius <= L) {
+          this.x = L + this.radius;
+          this.vx = -this.vx;
+          this.bounces++;
+          soundManager.playHit();
+          shakeScreen(3, 1);
+        } else if (this.x + this.radius >= R) {
+          this.x = R - this.radius;
+          this.vx = -this.vx;
+          this.bounces++;
+          soundManager.playHit();
+          shakeScreen(3, 1);
+        }
+        
+        if (this.y - this.radius <= T) {
+          this.y = T + this.radius;
+          this.vy = -this.vy;
+          this.bounces++;
+          soundManager.playHit();
+          shakeScreen(3, 1);
+        } else if (this.y + this.radius >= B) {
+          this.y = B - this.radius;
+          this.vy = -this.vy;
+          this.bounces++;
+          soundManager.playHit();
+          shakeScreen(3, 1);
+        }
+        
+        let dist = Math.sqrt((player.x - this.x)**2 + (player.y - this.y)**2);
+        if (dist < player.hitboxRadius + this.radius && player.invincibleTime <= 0) {
+          damagePlayer(6);
+          this.toRemove = true;
+        }
+        
+        if (this.bounces >= this.maxBounces) {
+          this.toRemove = true;
+          spawnExplosion(this.x, this.y, '#ffffff', 6);
+        }
+      }
+      
+      draw() {
+        ctx.save();
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 1.8;
+        ctx.fillStyle = '#ffffff';
+        
+        if (!isRetro) {
+          ctx.shadowBlur = 8;
+          ctx.shadowColor = '#ffffff';
+        }
+        
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI*2);
+        ctx.fill();
+        ctx.stroke();
+        
+        ctx.beginPath();
+        ctx.moveTo(this.x - this.radius*0.6, this.y - this.radius*0.2);
+        ctx.lineTo(this.x + this.radius*0.2, this.y + this.radius*0.6);
+        ctx.moveTo(this.x - this.radius*0.4, this.y - this.radius*0.5);
+        ctx.lineTo(this.x + this.radius*0.5, this.y + this.radius*0.4);
+        ctx.stroke();
+        
+        ctx.restore();
+      }
+    }
+    
+    class InkSplat {
+      constructor(L, R, T, B) {
+        this.x = L + 20 + Math.random() * (R - L - 40);
+        this.y = T + 20 + Math.random() * (B - T - 40);
+        this.timer = 0;
+        this.warnDuration = (currentMode === 'EINFACH') ? 45 : ((currentMode === 'NORMAL') ? 35 : 25);
+        this.radius = 24;
+        this.toRemove = false;
+      }
+      
+      update(L, R, T, B) {
+        this.timer++;
+        if (this.timer >= this.warnDuration) {
+          this.toRemove = true;
+          soundManager.playHit();
+          shakeScreen(8, 6);
+          
+          let dist = Math.sqrt((player.x - this.x)**2 + (player.y - this.y)**2);
+          if (dist < player.hitboxRadius + this.radius && player.invincibleTime <= 0) {
+            damagePlayer(10);
+          }
+          
+          let dropSpeed = (currentMode === 'EINFACH') ? 2.5 : ((currentMode === 'NORMAL') ? 4.0 : 5.5);
+          for (let i = 0; i < 6; i++) {
+            let angle = (i / 6) * Math.PI * 2 + Math.random() * 0.4;
+            projectiles.push(new GenericBullet('ink_drop', this.x, this.y, Math.cos(angle)*dropSpeed, Math.sin(angle)*dropSpeed, '#888888'));
+          }
+          
+          spawnExplosion(this.x, this.y, '#777777', 12);
+        }
+      }
+      
+      draw() {
+        ctx.save();
+        let t = this.timer / this.warnDuration;
+        
+        let pulse = Math.floor(gameFrame / 4) % 2 === 0;
+        ctx.strokeStyle = pulse ? '#ffffff' : '#444444';
+        ctx.lineWidth = 1;
+        ctx.setLineDash([4, 4]);
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI*2);
+        ctx.stroke();
+        
+        ctx.fillStyle = pulse ? 'rgba(255, 255, 255, 0.15)' : 'rgba(68, 68, 68, 0.08)';
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.radius * t, 0, Math.PI*2);
+        ctx.fill();
+        
+        if (t < 1.0) {
+          let dropHeight = 100 * (1 - t);
+          let dropY = this.y - dropHeight;
+          ctx.strokeStyle = '#ffffff';
+          ctx.lineWidth = 1.5;
+          ctx.fillStyle = '#ffffff';
+          ctx.beginPath();
+          ctx.arc(this.x, dropY, 4, 0, Math.PI*2);
+          ctx.fill();
+          ctx.stroke();
+          
+          ctx.beginPath();
+          ctx.moveTo(this.x, dropY);
+          ctx.lineTo(this.x, dropY - 8);
+          ctx.stroke();
+        }
+        ctx.restore();
+      }
+    }
+    
+    class StickmanSpear {
+      constructor(L, R, T, B) {
+        this.side = (Math.random() > 0.5) ? 'left' : 'right';
+        this.x = (this.side === 'left') ? L - 15 : R + 15;
+        this.y = T + 20 + Math.random() * (B - T - 40);
+        
+        this.timer = 0;
+        this.state = 'AIM';
+        this.toRemove = false;
+        
+        this.angle = 0;
+        this.speed = (currentMode === 'EINFACH') ? 7.0 : ((currentMode === 'NORMAL') ? 11.0 : 15.0);
+        this.vx = 0;
+        this.vy = 0;
+        
+        this.stuckTimer = 0;
+        this.stuckDuration = 70;
+        this.spearLength = 32;
+        this.enteredBox = false;
+      }
+      
+      update(L, R, T, B) {
+        this.timer++;
+        
+        if (this.state === 'AIM') {
+          let dx = player.x - this.x;
+          let dy = player.y - this.y;
+          this.angle = Math.atan2(dy, dx);
+          
+          let aimLimit = (currentMode === 'EINFACH') ? 45 : ((currentMode === 'NORMAL') ? 30 : 20);
+          if (this.timer >= aimLimit) {
+            this.state = 'THROW';
+            this.vx = Math.cos(this.angle) * this.speed;
+            this.vy = Math.sin(this.angle) * this.speed;
+            soundManager.playLaser();
+          }
+        } 
+        else if (this.state === 'THROW') {
+          this.x += this.vx;
+          this.y += this.vy;
+          
+          let tipX = this.x;
+          let tipY = this.y;
+          let tailX = this.x - Math.cos(this.angle) * this.spearLength;
+          let tailY = this.y - Math.sin(this.angle) * this.spearLength;
+          
+          let dist = pointToSegmentDistance(player.x, player.y, tipX, tipY, tailX, tailY);
+          if (dist < player.hitboxRadius + 7 && player.invincibleTime <= 0) {
+            damagePlayer(8);
+            this.toRemove = true;
+          }
+          
+          if (!this.enteredBox) {
+            if (this.x > L && this.x < R && this.y > T && this.y < B) {
+              this.enteredBox = true;
+            }
+          } else {
+            if (this.x <= L || this.x >= R || this.y <= T || this.y >= B) {
+              this.x = Math.max(L, Math.min(R, this.x));
+              this.y = Math.max(T, Math.min(B, this.y));
+              this.state = 'STUCK';
+              this.stuckTimer = 0;
+              soundManager.playHit();
+              shakeScreen(5, 3);
+            }
+          }
+        } 
+        else if (this.state === 'STUCK') {
+          this.stuckTimer++;
+          
+          if (player.invincibleTime <= 0) {
+            let tipX = this.x;
+            let tipY = this.y;
+            let tailX = this.x - Math.cos(this.angle) * this.spearLength;
+            let tailY = this.y - Math.sin(this.angle) * this.spearLength;
+            
+            let dist = pointToSegmentDistance(player.x, player.y, tipX, tipY, tailX, tailY);
+            if (dist < player.hitboxRadius + 6) {
+              damagePlayer(6);
+            }
+          }
+          
+          if (this.stuckTimer >= this.stuckDuration) {
+            this.state = 'FADE';
+            this.timer = 0;
+          }
+        } 
+        else if (this.state === 'FADE') {
+          if (this.timer > 15) {
+            this.toRemove = true;
+          }
+        }
+      }
+      
+      draw() {
+        ctx.save();
+        
+        if (this.state === 'AIM') {
+          ctx.strokeStyle = '#ffffff';
+          ctx.lineWidth = 1.5;
+          ctx.save();
+          ctx.translate(this.x, this.y);
+          ctx.beginPath();
+          ctx.arc(0, -6, 3, 0, Math.PI*2);
+          ctx.stroke();
+          ctx.beginPath();
+          ctx.moveTo(0, -3); ctx.lineTo(0, 5);
+          ctx.stroke();
+          let ax = Math.cos(this.angle) * 8;
+          let ay = Math.sin(this.angle) * 8;
+          ctx.beginPath();
+          ctx.moveTo(0, 0); ctx.lineTo(ax, ay);
+          ctx.stroke();
+          ctx.restore();
+          
+          if (Math.floor(gameFrame / 4) % 2 === 0) {
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
+            ctx.lineWidth = 1;
+            ctx.setLineDash([4, 4]);
+            ctx.beginPath();
+            ctx.moveTo(this.x, this.y);
+            ctx.lineTo(this.x + Math.cos(this.angle) * 500, this.y + Math.sin(this.angle) * 500);
+            ctx.stroke();
+          }
+        }
+        
+        if (this.state === 'THROW' || this.state === 'STUCK' || this.state === 'FADE') {
+          ctx.strokeStyle = '#ffffff';
+          ctx.lineWidth = 2.0;
+          if (this.state === 'STUCK') {
+            ctx.strokeStyle = (Math.floor(gameFrame / 3) % 2 === 0) ? '#ffffff' : '#888888';
+          }
+          if (this.state === 'FADE') {
+            ctx.globalAlpha = 1 - (this.timer / 15);
+          }
+          
+          if (!isRetro) {
+            ctx.shadowBlur = 8;
+            ctx.shadowColor = ctx.strokeStyle;
+          }
+          
+          let tipX = this.x;
+          let tipY = this.y;
+          let tailX = this.x - Math.cos(this.angle) * this.spearLength;
+          let tailY = this.y - Math.sin(this.angle) * this.spearLength;
+          
+          ctx.beginPath();
+          ctx.moveTo(tailX, tailY);
+          ctx.lineTo(tipX, tipY);
+          ctx.stroke();
+          
+          ctx.fillStyle = ctx.strokeStyle;
+          ctx.beginPath();
+          ctx.moveTo(tipX, tipY);
+          let tipAngle1 = this.angle + Math.PI - 0.3;
+          let tipAngle2 = this.angle + Math.PI + 0.3;
+          ctx.lineTo(tipX + Math.cos(tipAngle1) * 6, tipY + Math.sin(tipAngle1) * 6);
+          ctx.lineTo(tipX + Math.cos(tipAngle2) * 6, tipY + Math.sin(tipAngle2) * 6);
+          ctx.closePath();
+          ctx.fill();
+        }
+        ctx.restore();
+      }
+    }
+    
+    class PencilScribble {
+      constructor(L, R, T, B) {
+        this.segments = [];
+        this.timer = 0;
+        this.toRemove = false;
+        
+        this.maxTimer = PATTERN_DURATION;
+        
+        this.penX = L + 30 + Math.random() * (boxWidth - 60);
+        this.penY = T + 30 + Math.random() * (boxHeight - 60);
+        this.targetX = this.penX;
+        this.targetY = this.penY;
+        
+        this.angle = 0;
+        this.speed = (currentMode === 'EINFACH') ? 1.8 : ((currentMode === 'NORMAL') ? 3.0 : 4.2);
+      }
+      
+      update(L, R, T, B) {
+        this.timer++;
+        
+        let dist = Math.sqrt((this.targetX - this.penX)**2 + (this.targetY - this.penY)**2);
+        if (dist < 8 || this.timer % 30 === 0) {
+          this.targetX = L + 20 + Math.random() * (boxWidth - 40);
+          this.targetY = T + 20 + Math.random() * (boxHeight - 40);
+        }
+        
+        let dx = this.targetX - this.penX;
+        let dy = this.targetY - this.penY;
+        let len = Math.sqrt(dx*dx + dy*dy) || 1;
+        
+        let prevX = this.penX;
+        let prevY = this.penY;
+        
+        this.penX += (dx / len) * this.speed;
+        this.penY += (dy / len) * this.speed;
+        
+        if (this.timer < this.maxTimer - 60) {
+          this.segments.push({
+            x1: prevX,
+            y1: prevY,
+            x2: this.penX,
+            y2: this.penY,
+            timer: 0,
+            warnDuration: 30,
+            activeDuration: 25,
+            toRemove: false
+          });
+        }
+        
+        this.segments.forEach(seg => {
+          seg.timer++;
+          
+          let t = seg.timer;
+          if (t > seg.warnDuration && t <= seg.warnDuration + seg.activeDuration) {
+            if (player.invincibleTime <= 0) {
+              let distToPlayer = pointToSegmentDistance(player.x, player.y, seg.x1, seg.y1, seg.x2, seg.y2);
+              if (distToPlayer < player.hitboxRadius + 6) {
+                damagePlayer(4);
+              }
+            }
+          }
+          
+          if (t > seg.warnDuration + seg.activeDuration + 15) {
+            seg.toRemove = true;
+          }
+        });
+        
+        this.segments = this.segments.filter(seg => !seg.toRemove);
+        
+        if (this.timer >= this.maxTimer && this.segments.length === 0) {
+          this.toRemove = true;
+        }
+      }
+      
+      draw() {
+        ctx.save();
+        
+        this.segments.forEach(seg => {
+          ctx.beginPath();
+          ctx.moveTo(seg.x1, seg.y1);
+          ctx.lineTo(seg.x2, seg.y2);
+          
+          if (seg.timer <= seg.warnDuration) {
+            ctx.strokeStyle = '#ef4444';
+            ctx.lineWidth = 1;
+            ctx.stroke();
+          } else {
+            let age = seg.timer - seg.warnDuration;
+            let alpha = 1;
+            if (age > seg.activeDuration) {
+              alpha = 1 - (age - seg.activeDuration) / 15;
+            }
+            ctx.strokeStyle = `rgba(255, 255, 255, ${alpha * 0.8})`;
+            ctx.lineWidth = 4.5;
+            ctx.lineCap = 'round';
+            ctx.stroke();
+          }
+        });
+        
+        if (this.timer < this.maxTimer - 60) {
+          ctx.strokeStyle = '#ffffff';
+          ctx.fillStyle = '#ffffff';
+          ctx.lineWidth = 1.5;
+          ctx.save();
+          ctx.translate(this.penX, this.penY);
+          ctx.rotate(-Math.PI / 4 + Math.sin(gameFrame * 0.2) * 0.15);
+          
+          ctx.beginPath();
+          ctx.moveTo(0, 0);
+          ctx.lineTo(-4, -12);
+          ctx.lineTo(-10, -10);
+          ctx.closePath();
+          ctx.fill();
+          ctx.stroke();
+          
+          ctx.beginPath();
+          ctx.moveTo(-7, -11);
+          ctx.lineTo(-18, -35);
+          ctx.lineTo(-24, -33);
+          ctx.lineTo(-13, -9);
+          ctx.closePath();
+          ctx.fill();
+          ctx.stroke();
+          
+          ctx.restore();
+        }
+        
+        ctx.restore();
+      }
+    }
+
+    function drawSketchedHand(ctx, cx, cy, radius, rotAngle, isLeft, isClenched, strokeCol = '#ffffff', lineWidth = 2, shadowColor = '#ffffff', shadowBlur = 8) {
+      ctx.save();
+      ctx.translate(cx, cy);
+      ctx.rotate(rotAngle);
+      
+      ctx.strokeStyle = strokeCol;
+      ctx.fillStyle = strokeCol;
+      ctx.lineWidth = lineWidth;
+      
+      if (!isRetro && shadowBlur > 0) {
+        ctx.shadowBlur = shadowBlur;
+        ctx.shadowColor = shadowColor;
+      }
+      
+      ctx.beginPath();
+      if (isClenched) {
+        // Fist: palm circle and 4 knuckles
+        ctx.arc(0, 0, radius * 0.75, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+        
+        let knuckleR = radius * 0.28;
+        for (let i = 0; i < 4; i++) {
+          let angle = -Math.PI / 2 + 0.3 * (i - 1.5);
+          let kx = Math.cos(angle) * (radius * 0.75);
+          let ky = Math.sin(angle) * (radius * 0.75);
+          ctx.beginPath();
+          ctx.arc(kx, ky, knuckleR, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.stroke();
+        }
+        
+        let thumbAngle = isLeft ? Math.PI * 0.4 : -Math.PI * 0.4;
+        let tx = Math.cos(thumbAngle) * (radius * 0.5);
+        let ty = Math.sin(thumbAngle) * (radius * 0.5);
+        ctx.beginPath();
+        ctx.arc(tx, ty, radius * 0.3, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+      } else {
+        // Open hand: palm and extended fingers
+        ctx.arc(0, 0, radius * 0.65, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+        
+        for (let i = 0; i < 4; i++) {
+          let fingerAngle = -Math.PI / 2 + 0.35 * (i - 1.5);
+          let startX = Math.cos(fingerAngle) * (radius * 0.65);
+          let startY = Math.sin(fingerAngle) * (radius * 0.65);
+          let endX = Math.cos(fingerAngle) * (radius * 1.35);
+          let endY = Math.sin(fingerAngle) * (radius * 1.35);
+          
+          ctx.beginPath();
+          ctx.moveTo(startX, startY);
+          ctx.lineTo(endX, endY);
+          ctx.stroke();
+          
+          ctx.beginPath();
+          ctx.arc(endX, endY, radius * 0.16, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.stroke();
+        }
+        
+        let thumbAngle = isLeft ? Math.PI * 0.6 : -Math.PI * 0.6;
+        let startX = Math.cos(thumbAngle) * (radius * 0.5);
+        let startY = Math.sin(thumbAngle) * (radius * 0.5);
+        let endX = Math.cos(thumbAngle) * (radius * 1.05);
+        let endY = Math.sin(thumbAngle) * (radius * 1.05);
+        
+        ctx.beginPath();
+        ctx.moveTo(startX, startY);
+        ctx.lineTo(endX, endY);
+        ctx.stroke();
+        
+        ctx.beginPath();
+        ctx.arc(endX, endY, radius * 0.16, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+      }
+      
+      ctx.restore();
+    }
+
+    function drawStar(ctx, cx, cy, spikes, outerRadius, innerRadius, color) {
+      let rot = Math.PI / 2 * 3;
+      let x = cx;
+      let y = cy;
+      let step = Math.PI / spikes;
+
+      ctx.save();
+      ctx.fillStyle = color;
+      ctx.beginPath();
+      ctx.moveTo(cx, cy - outerRadius)
+      for (let i = 0; i < spikes; i++) {
+        x = cx + Math.cos(rot) * outerRadius;
+        y = cy + Math.sin(rot) * outerRadius;
+        ctx.lineTo(x, y)
+        rot += step
+
+        x = cx + Math.cos(rot) * innerRadius;
+        y = cy + Math.sin(rot) * innerRadius;
+        ctx.lineTo(x, y)
+        rot += step
+      }
+      ctx.lineTo(cx, cy - outerRadius)
+      ctx.closePath();
+      ctx.fill();
+      ctx.restore();
+    }
+
+    function drawActiveBoss() {
+      if (currentBossType === 'STICKMAN') {
+        drawStickmanBoss();
+      } else if (currentBossType === 'NIHIL') {
+        drawBossCore();
+      } else if (currentBossType === 'GLITCH') {
+        drawGlitchBoss();
+      } else if (currentBossType === 'GUMMI') {
+        drawGummiBoss();
+      } else if (currentBossType === 'PUNKT') {
+        drawPunktBoss();
+      }
+    }
+
+    function drawGlitchBoss() {
+      boss.pulse += 0.05;
+      let isPhase2 = (boss.hp < (boss.maxHp / 2) && currentMode !== 'EINFACH');
+      let isPhase3 = (boss.hp < (boss.maxHp / 4) && currentMode === 'SCHWER');
+      
+      let glitchOffset = isPhase3 ? 10 : (isPhase2 ? 7 : 4);
+      if (gameState === 'DEFEAT_ANIM') glitchOffset = 30;
+      
+      let gox = (Math.random() - 0.5) * glitchOffset;
+      let goy = (Math.random() - 0.5) * glitchOffset;
+      let cx = boss.x + gox;
+      let cy = boss.y + goy;
+      
+      ctx.save();
+      if (gameState === 'DEFEAT_ANIM') {
+        ctx.globalAlpha = Math.max(0, 1 - defeatTimer / 120);
+        // Violent glitch horizontal scan lines / noise
+        if (Math.random() < 0.6) {
+          ctx.strokeStyle = '#ef4444';
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.moveTo(cx - 80 - Math.random() * 20, cy + (Math.random() - 0.5) * 80);
+          ctx.lineTo(cx + 80 + Math.random() * 20, cy + (Math.random() - 0.5) * 80);
+          ctx.stroke();
+        }
+      }
+      
+      // Hit flash & shake
+      let strokeCol = '#ffffff';
+      if (boss.isHurt > 0) {
+        strokeCol = (gameFrame % 4 < 2) ? '#ef4444' : '#333333';
+        cx += (Math.random() - 0.5) * 6;
+        cy += (Math.random() - 0.5) * 6;
+        boss.isHurt--;
+      }
+      
+      if (isPhase3 && !isRetro) {
+        ctx.shadowBlur = 14;
+        ctx.shadowColor = '#ef4444';
+      } else if (!isRetro) {
+        ctx.shadowBlur = 10;
+        ctx.shadowColor = strokeCol;
+      }
+      
+      ctx.strokeStyle = strokeCol;
+      ctx.lineWidth = 3;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      
+      // Twitchy antennae
+      let legVib = Math.sin(gameFrame * 0.2) * 5;
+      ctx.beginPath();
+      ctx.moveTo(cx - 8, cy - 24);
+      ctx.lineTo(cx - 24 + legVib, cy - 48);
+      ctx.moveTo(cx + 8, cy - 24);
+      ctx.lineTo(cx + 24 - legVib, cy - 48);
+      ctx.stroke();
+      
+      // Twitchy legs
+      ctx.beginPath();
+      // Left
+      ctx.moveTo(cx - 20, cy - 8); ctx.lineTo(cx - 45, cy - 20 + legVib);
+      ctx.moveTo(cx - 22, cy + 2); ctx.lineTo(cx - 50, cy + legVib);
+      ctx.moveTo(cx - 20, cy + 12); ctx.lineTo(cx - 45, cy + 20 + legVib);
+      // Right
+      ctx.moveTo(cx + 20, cy - 8); ctx.lineTo(cx + 45, cy - 20 - legVib);
+      ctx.moveTo(cx + 22, cy + 2); ctx.lineTo(cx + 50, cy - legVib);
+      ctx.moveTo(cx + 20, cy + 12); ctx.lineTo(cx + 45, cy + 20 - legVib);
+      ctx.stroke();
+      
+      // Body (black fill to hide legs)
+      ctx.fillStyle = '#000000';
+      ctx.beginPath();
+      ctx.arc(cx, cy, 25, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+      
+      // Eyes
+      if (isPhase2 || isPhase3) {
+        // Red X cross eyes
+        let eyeCol = isPhase3 ? '#ef4444' : '#ef4444';
+        ctx.strokeStyle = eyeCol;
+        ctx.lineWidth = 2.5;
+        // Left eye cross
+        ctx.beginPath();
+        ctx.moveTo(cx - 12, cy - 12); ctx.lineTo(cx - 4, cy - 4);
+        ctx.moveTo(cx - 4, cy - 12); ctx.lineTo(cx - 12, cy - 4);
+        ctx.stroke();
+        // Right eye cross
+        ctx.beginPath();
+        ctx.moveTo(cx + 4, cy - 12); ctx.lineTo(cx + 12, cy - 4);
+        ctx.moveTo(cx + 12, cy - 12); ctx.lineTo(cx + 4, cy - 4);
+        ctx.stroke();
+        // Angry mouth
+        ctx.beginPath();
+        ctx.moveTo(cx - 8, cy + 10);
+        ctx.lineTo(cx + 8, cy + 10);
+        ctx.stroke();
+      } else {
+        ctx.fillStyle = strokeCol;
+        ctx.beginPath();
+        ctx.arc(cx - 8, cy - 8, 3, 0, Math.PI * 2);
+        ctx.arc(cx + 8, cy - 8, 3, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      
+      ctx.restore();
+      
+      // Phase 3: Orbiting binary digits (0 and 1)
+      if (isPhase3 && gameState !== 'DEFEAT_ANIM') {
+        ctx.save();
+        ctx.font = "9px 'Press Start 2P'";
+        ctx.textAlign = 'center';
+        const binaryChars = ['0', '1', '0', '1', '0', '1', '0', '1'];
+        for (let i = 0; i < binaryChars.length; i++) {
+          let orbitAngle = (gameFrame * 0.04 + i * Math.PI * 2 / binaryChars.length);
+          let orbitR = 42 + Math.sin(gameFrame * 0.05 + i) * 6;
+          let bx = boss.x + Math.cos(orbitAngle) * orbitR;
+          let by = boss.y + Math.sin(orbitAngle) * orbitR;
+          let alpha = 0.5 + 0.5 * Math.sin(gameFrame * 0.1 + i);
+          ctx.fillStyle = `rgba(255, 255, 255, ${alpha})`;
+          ctx.fillText(binaryChars[i], bx, by);
+        }
+        // Glitch-flicker horizontal scan lines
+        if (Math.floor(gameFrame / 4) % 3 === 0) {
+          ctx.fillStyle = 'rgba(239, 68, 68, 0.12)';
+          for (let scanY = boss.y - 30; scanY < boss.y + 30; scanY += 6) {
+            ctx.fillRect(boss.x - 50, scanY, 100, 2);
+          }
+        }
+        ctx.restore();
+      }
+      
+      if (gameState !== 'DEFEAT_ANIM') {
+        // Draw Name and HP Bar
+        ctx.save();
+        ctx.fillStyle = isPhase3 ? '#ef4444' : '#ffffff';
+        ctx.font = "10px 'Press Start 2P'";
+        ctx.textAlign = 'center';
+        
+        let displayName = boss.name;
+        if (isPhase3 && Math.random() < 0.2) {
+          displayName = 'GL1TCH!!!';
+        } else if (isPhase2 && Math.random() < 0.15) {
+          displayName = Math.random() < 0.5 ? 'G11TCH' : 'GL1TCH';
+        }
+        ctx.fillText(displayName, boss.x, boss.y - 48);
+        
+        let hbWidth = 140;
+        let hbX = boss.x - hbWidth/2;
+        let hbY = boss.y - 38;
+        ctx.fillStyle = '#333333';
+        ctx.fillRect(hbX, hbY, hbWidth, 6);
+        ctx.fillStyle = isPhase3 ? '#ef4444' : (isPhase2 ? '#ef4444' : '#ffffff');
+        ctx.fillRect(hbX, hbY, hbWidth * (boss.hp / boss.maxHp), 6);
+        ctx.restore();
+      }
+    }
+
+
+    function drawGummiBoss() {
+      boss.pulse += 0.05;
+      let isPhase2 = (boss.hp < (boss.maxHp / 2) && currentMode !== 'EINFACH');
+      let isPhase3 = (boss.hp < (boss.maxHp / 4) && currentMode === 'SCHWER');
+      
+      let cx = boss.x;
+      let cy = boss.y;
+      
+      ctx.save();
+      let strokeCol = '#ffffff';
+      if (boss.isHurt > 0) {
+        strokeCol = (gameFrame % 4 < 2) ? '#ef4444' : '#333333';
+        cx += (Math.random() - 0.5) * 6;
+        cy += (Math.random() - 0.5) * 6;
+        boss.isHurt--;
+      }
+      
+      // Phase 3: red flicker on the eraser
+      if (isPhase3) {
+        strokeCol = (gameFrame % 8 < 4) ? '#ef4444' : strokeCol;
+        if (!isRetro) {
+          ctx.shadowBlur = 12;
+          ctx.shadowColor = '#ef4444';
+        }
+      } else if (!isRetro) {
+        ctx.shadowBlur = 10;
+        ctx.shadowColor = strokeCol;
+      }
+      
+      ctx.translate(cx, cy);
+      ctx.rotate(-Math.PI / 8 + Math.sin(gameFrame * 0.03) * 0.04);
+      
+      ctx.strokeStyle = strokeCol;
+      ctx.fillStyle = '#000000';
+      ctx.lineWidth = isPhase3 ? 4 : 3;
+      
+      // Shrink size slightly as HP drops to show wear/crumbling
+      let hpScale = 0.75 + 0.25 * (boss.hp / boss.maxHp);
+      if (gameState === 'DEFEAT_ANIM') {
+        let scale = Math.max(0, 1 - defeatTimer / 120);
+        hpScale = hpScale * scale;
+        ctx.translate(defeatTimer * 0.8, defeatTimer * 1.5);
+        ctx.rotate(defeatTimer * 0.08);
+      }
+      ctx.scale(hpScale, hpScale);
+      
+      // Eraser block outline
+      ctx.beginPath();
+      ctx.rect(-55, -28, 110, 56);
+      ctx.fill();
+      ctx.stroke();
+      
+      // Inner line (stripe separator)
+      ctx.beginPath();
+      ctx.moveTo(-18, -27);
+      ctx.lineTo(-18, 27);
+      ctx.stroke();
+      
+      // Phase 2/3: Draw angry face on the eraser block
+      if (isPhase2 || isPhase3) {
+        let faceCol = isPhase3 ? '#ef4444' : strokeCol;
+        ctx.strokeStyle = faceCol;
+        ctx.lineWidth = isPhase3 ? 3 : 2;
+        
+        // Angry eyebrows (angled)
+        ctx.beginPath();
+        ctx.moveTo(5, -14); ctx.lineTo(22, -20);   // left eyebrow
+        ctx.moveTo(32, -20); ctx.lineTo(48, -14);  // right eyebrow
+        ctx.stroke();
+        
+        // Eyes (small rect dots)
+        ctx.fillStyle = faceCol;
+        ctx.fillRect(8, -10, 10, 7);
+        ctx.fillRect(34, -10, 10, 7);
+        
+        // Frown mouth
+        ctx.beginPath();
+        ctx.moveTo(8, 12);
+        ctx.lineTo(22, 18);
+        ctx.lineTo(36, 12);
+        ctx.stroke();
+        
+        // Phase 3: "DIES" text inside the eraser
+        if (isPhase3) {
+          ctx.save();
+          ctx.fillStyle = '#ef4444';
+          ctx.font = "bold 12px 'Press Start 2P'";
+          ctx.textAlign = 'center';
+          // Flicker the DIES text
+          if (Math.floor(gameFrame / 6) % 2 === 0) {
+            ctx.fillText('DIES', 15, 6);
+          }
+          ctx.restore();
+        }
+      }
+      
+      ctx.restore();
+      
+      if (gameState !== 'DEFEAT_ANIM') {
+        // Draw Name and HP Bar
+        ctx.save();
+        ctx.fillStyle = isPhase3 ? '#ef4444' : '#ffffff';
+        ctx.font = "10px 'Press Start 2P'";
+        ctx.textAlign = 'center';
+        
+        let displayName = boss.name;
+        if (isPhase3 && Math.random() < 0.1) {
+          displayName = 'STIRB!!!';
+        } else if (isPhase2 && Math.random() < 0.15) {
+          displayName = 'GUMM1';
+        }
+        ctx.fillText(displayName, boss.x, boss.y - 48);
+        
+        let hbWidth = 140;
+        let hbX = boss.x - hbWidth/2;
+        let hbY = boss.y - 38;
+        ctx.fillStyle = '#333333';
+        ctx.fillRect(hbX, hbY, hbWidth, 6);
+        ctx.fillStyle = isPhase3 ? '#ef4444' : (isPhase2 ? '#ef4444' : '#ffffff');
+        ctx.fillRect(hbX, hbY, hbWidth * (boss.hp / boss.maxHp), 6);
+        ctx.restore();
+      }
+    }
+
+
+    function drawPunktBoss() {
+      boss.pulse += 0.05;
+      let isPhase2 = (boss.hp < (boss.maxHp / 2) && currentMode !== 'EINFACH');
+      let isPhase3 = (boss.hp < (boss.maxHp / 4) && currentMode === 'SCHWER');
+      
+      let cx = boss.x;
+      let cy = boss.y;
+      
+      ctx.save();
+      let strokeCol = '#ffffff';
+      let fillCol = '#000000';
+      
+      if (boss.isHurt > 0) {
+        strokeCol = (gameFrame % 4 < 2) ? '#ef4444' : '#333333';
+        cx += (Math.random() - 0.5) * 6;
+        cy += (Math.random() - 0.5) * 6;
+        boss.isHurt--;
+      }
+      
+      // Phase 3: huge, red glow
+      if (isPhase3) {
+        if (!isRetro) {
+          ctx.shadowBlur = 20;
+          ctx.shadowColor = '#ef4444';
+        }
+        strokeCol = (gameFrame % 6 < 3) ? '#ef4444' : strokeCol;
+      }
+      
+      // Size grows with phase
+      let basePSize = isPhase3 ? 100 : (isPhase2 ? 65 : 40);
+      let psize = basePSize + Math.sin(gameFrame * 0.05) * (isPhase3 ? 12 : 6);
+      
+      if (gameState === 'DEFEAT_ANIM') {
+        let scale = Math.max(0, 1 - defeatTimer / 120);
+        psize = psize * scale;
+        cy += defeatTimer * 0.4;
+      }
+      
+      ctx.fillStyle = fillCol;
+      ctx.fillRect(cx - psize/2, cy - psize/2, psize, psize);
+      
+      ctx.strokeStyle = strokeCol;
+      ctx.lineWidth = isPhase3 ? 5 : 3;
+      ctx.strokeRect(cx - psize/2, cy - psize/2, psize, psize);
+      
+      // Phase 3: second outer glow border
+      if (isPhase3 && gameState !== 'DEFEAT_ANIM') {
+        ctx.strokeStyle = 'rgba(239, 68, 68, 0.4)';
+        ctx.lineWidth = 10;
+        ctx.strokeRect(cx - psize/2 - 5, cy - psize/2 - 5, psize + 10, psize + 10);
+      }
+      
+      // Draw face inside the square
+      ctx.save();
+      if (isPhase2 || isPhase3) {
+        // Angry/stern look: horizontal line eyes + frown
+        let eyeSize = psize * 0.08;
+        let eyeY = cy - psize * 0.12;
+        let eyeSpacing = psize * 0.18;
+        
+        // Stern eyebrows (angled lines)
+        ctx.strokeStyle = isPhase3 ? '#ef4444' : strokeCol;
+        ctx.lineWidth = isPhase3 ? 4 : 2.5;
+        ctx.beginPath();
+        ctx.moveTo(cx - eyeSpacing - eyeSize, eyeY - eyeSize * 2);
+        ctx.lineTo(cx - eyeSpacing + eyeSize, eyeY - eyeSize);
+        ctx.moveTo(cx + eyeSpacing - eyeSize, eyeY - eyeSize);
+        ctx.lineTo(cx + eyeSpacing + eyeSize, eyeY - eyeSize * 2);
+        ctx.stroke();
+        
+        // Horizontal line eyes
+        ctx.beginPath();
+        ctx.moveTo(cx - eyeSpacing - eyeSize, eyeY);
+        ctx.lineTo(cx - eyeSpacing + eyeSize, eyeY);
+        ctx.moveTo(cx + eyeSpacing - eyeSize, eyeY);
+        ctx.lineTo(cx + eyeSpacing + eyeSize, eyeY);
+        ctx.stroke();
+        
+        // Frown
+        ctx.beginPath();
+        ctx.moveTo(cx - eyeSpacing, cy + psize * 0.2);
+        ctx.lineTo(cx + eyeSpacing, cy + psize * 0.2);
+        ctx.stroke();
+      } else {
+        // Phase 1: simple dot eyes + neutral mouth
+        let eyeSize = psize * 0.1;
+        let eyeSpacing = psize * 0.18;
+        let eyeY = cy - psize * 0.1;
+        
+        ctx.fillStyle = strokeCol;
+        ctx.fillRect(cx - eyeSpacing - eyeSize/2, eyeY - eyeSize/2, eyeSize, eyeSize);
+        ctx.fillRect(cx + eyeSpacing - eyeSize/2, eyeY - eyeSize/2, eyeSize, eyeSize);
+        
+        ctx.strokeStyle = strokeCol;
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(cx - eyeSpacing, cy + psize * 0.18);
+        ctx.lineTo(cx + eyeSpacing, cy + psize * 0.18);
+        ctx.stroke();
+      }
+      ctx.restore();
+      
+      ctx.restore();
+      
+      if (gameState !== 'DEFEAT_ANIM') {
+        // Draw Name and HP Bar
+        ctx.save();
+        ctx.fillStyle = isPhase3 ? '#ef4444' : '#ffffff';
+        ctx.font = "10px 'Press Start 2P'";
+        ctx.textAlign = 'center';
+        
+        let displayName = boss.name;
+        if (isPhase3 && Math.random() < 0.1) {
+          displayName = 'PUN.KT!!!';
+        } else if (isPhase2 && Math.random() < 0.15) {
+          displayName = Math.random() < 0.5 ? 'PUNK1' : 'PUN.KT';
+        }
+        ctx.fillText(displayName, boss.x, boss.y - psize/2 - 12);
+        
+        let hbWidth = 140;
+        let hbX = boss.x - hbWidth/2;
+        let hbY = boss.y - psize/2 - 4;
+        ctx.fillStyle = '#333333';
+        ctx.fillRect(hbX, hbY, hbWidth, 6);
+        ctx.fillStyle = isPhase3 ? '#ef4444' : (isPhase2 ? '#ef4444' : '#ffffff');
+        ctx.fillRect(hbX, hbY, hbWidth * (boss.hp / boss.maxHp), 6);
+        ctx.restore();
+      }
+    }
+    function drawStickmanBoss() {
+      let headBobY = Math.sin(gameFrame * 0.05) * 4;
+      let handBobY = Math.cos(gameFrame * 0.05) * 6;
+      
+      let L = BOX_CENTER_X - boxWidth/2;
+      let R = BOX_CENTER_X + boxWidth/2;
+      let T = BOX_CENTER_Y - boxHeight/2;
+      let B = BOX_CENTER_Y + boxHeight/2;
+      
+      let headX = BOX_CENTER_X;
+      let headY = T - 42 + headBobY;
+      let headRadius = 26;
+      
+      let leftHandX = L - 25;
+      let leftHandY = BOX_CENTER_Y + handBobY;
+      let rightHandX = R + 25;
+      let rightHandY = BOX_CENTER_Y - handBobY;
+      
+      if (gameState === 'DEFEAT_ANIM') {
+        let drift = defeatTimer * 0.8;
+        headY -= drift * 1.2;
+        leftHandY += drift;
+        leftHandX -= drift * 0.5;
+        rightHandY += drift;
+        rightHandX += drift * 0.5;
+      }
+      
+      if (handPunch.active) {
+        let duration = handPunch.duration;
+        let warnDuration = handPunch.warnDuration;
+        let px = handPunch.startX;
+        let py = handPunch.startY;
+        
+        if (handPunch.timer > warnDuration && handPunch.timer <= duration) {
+          let t = (handPunch.timer - warnDuration) / (duration - warnDuration);
+          let punchProgress = Math.sin(t * Math.PI);
+          px = handPunch.startX + (handPunch.targetX - handPunch.startX) * punchProgress;
+          py = handPunch.startY + (handPunch.targetY - handPunch.startY) * punchProgress;
+        }
+        
+        if (handPunch.hand === 'left') {
+          leftHandX = px;
+          leftHandY = py;
+        } else {
+          rightHandX = px;
+          rightHandY = py;
+        }
+      }
+      
+      if (handClap.active) {
+        let duration = handClap.duration;
+        let warnDuration = handClap.warnDuration;
+        
+        let lx = L - 25;
+        let rx = R + 25;
+        let ly = BOX_CENTER_Y;
+        let ry = BOX_CENTER_Y;
+        
+        if (handClap.timer > warnDuration && handClap.timer <= duration) {
+          let t = (handClap.timer - warnDuration) / (duration - warnDuration);
+          let clapProgress = Math.sin(t * Math.PI);
+          let midL = BOX_CENTER_X - 12;
+          let midR = BOX_CENTER_X + 12;
+          lx = (L - 25) + (midL - (L - 25)) * clapProgress;
+          rx = (R + 25) + (midR - (R + 25)) * clapProgress;
+        }
+        
+        leftHandX = lx;
+        leftHandY = ly;
+        rightHandX = rx;
+        rightHandY = ry;
+      }
+      
+      ctx.save();
+      if (gameState === 'DEFEAT_ANIM') {
+        ctx.globalAlpha = Math.max(0, 1 - defeatTimer / 120);
+      }
+      
+      let strokeCol = '#ffffff';
+      let offsetHurtX = 0;
+      let offsetHurtY = 0;
+      if (boss.isHurt > 0) {
+        strokeCol = (gameFrame % 4 < 2) ? '#ef4444' : '#333333';
+        offsetHurtX = (Math.random() - 0.5) * 8;
+        offsetHurtY = (Math.random() - 0.5) * 8;
+        boss.isHurt--;
+      }
+      
+      ctx.translate(offsetHurtX, offsetHurtY);
+      ctx.strokeStyle = strokeCol;
+      ctx.lineWidth = 3;
+      
+      let isPhase3 = (boss.hp < (boss.maxHp / 4) && currentMode === 'SCHWER');
+      let isPhase2 = (boss.hp < (boss.maxHp / 2));
+      
+      // PHASE 3 SPECIAL: Giant bottom-up 3D perspective view
+      if (isPhase3) {
+        ctx.restore(); // restore from the outer save
+        
+        // Red screen edge vignette
+        ctx.save();
+        let vigGrad = ctx.createRadialGradient(BOX_CENTER_X, BOX_CENTER_Y, 80, BOX_CENTER_X, BOX_CENTER_Y, 320);
+        vigGrad.addColorStop(0, 'rgba(0,0,0,0)');
+        vigGrad.addColorStop(1, 'rgba(200,0,0,0.35)');
+        ctx.fillStyle = vigGrad;
+        ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+        ctx.restore();
+        
+        ctx.save();
+        let sc = strokeCol; // already set
+        if (!isRetro) { ctx.shadowBlur = 18; ctx.shadowColor = '#ef4444'; }
+        ctx.strokeStyle = '#ef4444';
+        ctx.fillStyle = '#000000';
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        
+        // Bottom-up perspective: "feet" are huge at the bottom, body converges to tiny at top
+        let footY = CANVAS_HEIGHT - 10; // feet near bottom edge
+        let bodyTopY = 80; // body vanishes high up
+        let footSpread = 110 + Math.sin(gameFrame * 0.05) * 8; // wide feet
+        let torsoTopX = BOX_CENTER_X; // converge to center
+        
+        if (gameState === 'DEFEAT_ANIM') {
+          ctx.globalAlpha = Math.max(0, 1 - defeatTimer / 120);
+          footY += defeatTimer * 1.5;
+          bodyTopY += defeatTimer * 0.8;
+        }
+        
+        // Left leg (perspective: wide at bottom, narrow at top)
+        ctx.lineWidth = 14 + Math.sin(gameFrame * 0.07) * 2;
+        ctx.beginPath();
+        ctx.moveTo(BOX_CENTER_X - footSpread, footY);
+        ctx.quadraticCurveTo(BOX_CENTER_X - 40, footY - 200, torsoTopX - 10, bodyTopY + 60);
+        ctx.stroke();
+        
+        // Right leg
+        ctx.beginPath();
+        ctx.moveTo(BOX_CENTER_X + footSpread, footY);
+        ctx.quadraticCurveTo(BOX_CENTER_X + 40, footY - 200, torsoTopX + 10, bodyTopY + 60);
+        ctx.stroke();
+        
+        // Feet (huge rectangular blocks at bottom)
+        ctx.lineWidth = 4;
+        ctx.fillStyle = '#000000';
+        ctx.strokeStyle = '#ef4444';
+        // Left foot
+        ctx.beginPath();
+        ctx.rect(BOX_CENTER_X - footSpread - 20, footY - 25, 55, 30);
+        ctx.fill(); ctx.stroke();
+        // Right foot
+        ctx.beginPath();
+        ctx.rect(BOX_CENTER_X + footSpread - 35, footY - 25, 55, 30);
+        ctx.fill(); ctx.stroke();
+        
+        // Torso (trapezoid-ish - wide at bottom, narrow at top of torso area)
+        ctx.lineWidth = 8;
+        ctx.beginPath();
+        ctx.moveTo(torsoTopX - 10, bodyTopY + 60);
+        ctx.lineTo(torsoTopX + 10, bodyTopY + 60);
+        ctx.stroke();
+        
+        // Arms splayed wide upward (perspective: arm bases near center top, hands out of frame)
+        ctx.lineWidth = 10;
+        ctx.beginPath();
+        ctx.moveTo(torsoTopX, bodyTopY + 80);
+        ctx.lineTo(-40, bodyTopY + 10); // left arm goes off-screen left
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(torsoTopX, bodyTopY + 80);
+        ctx.lineTo(CANVAS_WIDTH + 40, bodyTopY + 10); // right arm off-screen right
+        ctx.stroke();
+        
+        // Head: tiny in the distance at the top
+        ctx.lineWidth = 3;
+        ctx.strokeStyle = '#ef4444';
+        ctx.beginPath();
+        ctx.arc(torsoTopX, bodyTopY + 20, 18, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+        
+        // Tiny angry eyes on distant head
+        ctx.fillStyle = '#ef4444';
+        ctx.fillRect(torsoTopX - 8, bodyTopY + 14, 5, 5);
+        ctx.fillRect(torsoTopX + 3, bodyTopY + 14, 5, 5);
+        
+        ctx.restore();
+        
+        if (gameState !== 'DEFEAT_ANIM') {
+          // Phase 3 warning text
+          ctx.save();
+          ctx.fillStyle = (gameFrame % 20 < 10) ? '#ef4444' : '#ffffff';
+          ctx.font = "12px 'Press Start 2P'";
+          ctx.textAlign = 'center';
+          ctx.fillText('PHASE 3 - TITAN!', BOX_CENTER_X, T - 10);
+          ctx.restore();
+          
+          // HP Bar for phase 3
+          ctx.save();
+          ctx.fillStyle = '#ffffff';
+          ctx.font = "10px 'Press Start 2P'";
+          ctx.textAlign = 'center';
+          ctx.fillText(boss.name, BOX_CENTER_X, T - 26);
+          let hbWidth = 140;
+          let hbX = BOX_CENTER_X - hbWidth/2;
+          let hbY = T - 18;
+          ctx.fillStyle = '#333333';
+          ctx.fillRect(hbX, hbY, hbWidth, 6);
+          ctx.fillStyle = '#ef4444';
+          ctx.fillRect(hbX, hbY, hbWidth * (boss.hp / boss.maxHp), 6);
+          ctx.restore();
+        }
+        
+        return; // Skip normal stickman draw
+      }
+      
+
+      
+      if (isPhase3 && !isRetro) {
+        ctx.shadowBlur = 12;
+        ctx.shadowColor = '#ef4444';
+      }
+      
+      ctx.beginPath();
+      ctx.moveTo(headX, headY + headRadius);
+      ctx.lineTo(headX, T);
+      ctx.stroke();
+      
+      let shoulderY = headY + headRadius + 10;
+      let leftElbowX = (headX + leftHandX) / 2 - 15;
+      let leftElbowY = (shoulderY + leftHandY) / 2 + 5;
+      
+      let rightElbowX = (headX + rightHandX) / 2 + 15;
+      let rightElbowY = (shoulderY + rightHandY) / 2 + 5;
+      
+      if (isPhase3) {
+        ctx.save();
+        ctx.strokeStyle = '#ef4444';
+        ctx.lineWidth = 8;
+        if (!isRetro) {
+          ctx.shadowBlur = 15;
+          ctx.shadowColor = '#ef4444';
+        }
+        
+        ctx.beginPath();
+        ctx.moveTo(headX, shoulderY);
+        ctx.lineTo(leftElbowX, leftElbowY);
+        ctx.lineTo(leftHandX, leftHandY);
+        ctx.stroke();
+        
+        ctx.beginPath();
+        ctx.moveTo(headX, shoulderY);
+        ctx.lineTo(rightElbowX, rightElbowY);
+        ctx.lineTo(rightHandX, rightHandY);
+        ctx.stroke();
+        
+        let isLeftPunching = handPunch.active && handPunch.hand === 'left';
+        let isRightPunching = handPunch.active && handPunch.hand === 'right';
+        let isClenchingLeft = isLeftPunching || handClap.active;
+        let isClenchingRight = isRightPunching || handClap.active;
+        
+        drawSketchedHand(ctx, leftHandX, leftHandY, 12, isLeftPunching ? Math.PI : 0, true, isClenchingLeft, '#ef4444', 8, '#ef4444', 15);
+        drawSketchedHand(ctx, rightHandX, rightHandY, 12, isRightPunching ? 0 : 0, false, isClenchingRight, '#ef4444', 8, '#ef4444', 15);
+        ctx.restore();
+      }
+      
+      ctx.beginPath();
+      ctx.moveTo(headX, shoulderY);
+      ctx.lineTo(leftElbowX, leftElbowY);
+      ctx.lineTo(leftHandX, leftHandY);
+      ctx.stroke();
+      
+      ctx.beginPath();
+      ctx.moveTo(headX, shoulderY);
+      ctx.lineTo(rightElbowX, rightElbowY);
+      ctx.lineTo(rightHandX, rightHandY);
+      ctx.stroke();
+      
+      let isLeftPunching = handPunch.active && handPunch.hand === 'left';
+      let isRightPunching = handPunch.active && handPunch.hand === 'right';
+      let isClenchingLeft = isLeftPunching || handClap.active;
+      let isClenchingRight = isRightPunching || handClap.active;
+      
+      drawSketchedHand(ctx, leftHandX, leftHandY, 12, isLeftPunching ? Math.PI : 0, true, isClenchingLeft, strokeCol, 3, strokeCol, 0);
+      drawSketchedHand(ctx, rightHandX, rightHandY, 12, isRightPunching ? 0 : 0, false, isClenchingRight, strokeCol, 3, strokeCol, 0);
+      
+      ctx.beginPath();
+      ctx.arc(headX, headY, headRadius, 0, Math.PI*2);
+      ctx.fill();
+      ctx.stroke();
+      
+      ctx.fillStyle = strokeCol;
+      ctx.beginPath();
+      ctx.arc(headX - 8, headY - 4, 2.5, 0, Math.PI*2);
+      ctx.fill();
+      
+      if (isPhase2) {
+        drawStar(ctx, headX + 8, headY - 4, 5, 7, 3, '#ef4444');
+      } else {
+        ctx.beginPath();
+        ctx.arc(headX + 8, headY - 4, 2.5, 0, Math.PI*2);
+        ctx.fill();
+      }
+      
+      ctx.beginPath();
+      if (isPhase2) {
+        ctx.moveTo(headX - 10, headY + 8);
+        ctx.lineTo(headX + 10, headY + 8);
+      } else {
+        ctx.arc(headX, headY + 6, 6, 0.1, Math.PI - 0.1);
+      }
+      ctx.stroke();
+      
+      ctx.restore();
+      
+      if (handPunch.active && handPunch.timer <= handPunch.warnDuration) {
+        ctx.save();
+        if (Math.floor(gameFrame / 4) % 2 === 0) {
+          ctx.strokeStyle = '#ef4444';
+          ctx.lineWidth = 1.5;
+          ctx.setLineDash([6, 6]);
+          ctx.beginPath();
+          ctx.moveTo(handPunch.startX, handPunch.startY);
+          ctx.lineTo(handPunch.targetX, handPunch.targetY);
+          ctx.stroke();
+        }
+        ctx.restore();
+      }
+      
+      if (handClap.active && handClap.timer <= handClap.warnDuration) {
+        ctx.save();
+        if (Math.floor(gameFrame / 4) % 2 === 0) {
+          ctx.fillStyle = 'rgba(255, 255, 255, 0.15)';
+          ctx.fillRect(L, T, BOX_CENTER_X - L, boxHeight);
+          ctx.fillRect(BOX_CENTER_X, T, R - BOX_CENTER_X, boxHeight);
+          
+          ctx.strokeStyle = '#ef4444';
+          ctx.lineWidth = 2.5;
+          ctx.setLineDash([4, 4]);
+          ctx.beginPath();
+          ctx.moveTo(BOX_CENTER_X, T + 4);
+          ctx.lineTo(BOX_CENTER_X, B - 4);
+          ctx.stroke();
+          
+          ctx.fillStyle = '#ef4444';
+          ctx.font = "8px 'Press Start 2P'";
+          ctx.textAlign = 'center';
+          ctx.fillText("HÄNDE-KLATSCHEN!", BOX_CENTER_X, BOX_CENTER_Y - 45);
+        }
+        ctx.restore();
+      }
+      
+      if (gameState !== 'DEFEAT_ANIM') {
+        ctx.save();
+        ctx.fillStyle = '#ffffff';
+        ctx.font = "10px 'Press Start 2P'";
+        ctx.textAlign = 'center';
+        
+        let displayName = boss.name;
+        if (isPhase2 && Math.random() < 0.15) {
+          displayName = "ST1CKMAN";
+        }
+        ctx.fillText(displayName, headX, headY - 38);
+        
+        let hbWidth = 140;
+        let hbX = headX - hbWidth/2;
+        let hbY = headY - 26;
+        ctx.fillStyle = '#333333';
+        ctx.fillRect(hbX, hbY, hbWidth, 6);
+        ctx.fillStyle = '#ffffff';
+        if (isPhase2) ctx.fillStyle = '#ef4444';
+        ctx.fillRect(hbX, hbY, hbWidth * (boss.hp / boss.maxHp), 6);
+        
         ctx.restore();
       }
     }
@@ -1730,19 +3434,38 @@
 
     function drawBossCore() {
       boss.pulse += 0.05;
-      let centerR = 18 + Math.sin(boss.pulse) * 3;
+      let isPhase2 = (boss.hp < (boss.maxHp / 2) && currentMode !== 'EINFACH');
+      let isPhase3 = (boss.hp < (boss.maxHp / 4) && currentMode === 'SCHWER');
+      
+      let speedMult = isPhase3 ? 2.5 : (isPhase2 ? 1.7 : 1.0);
+      if (gameState === 'DEFEAT_ANIM') speedMult = 5.0;
+      
+      let centerR = 18 + Math.sin(boss.pulse * speedMult) * 3;
+      if (gameState === 'DEFEAT_ANIM') {
+        centerR = 18 + defeatTimer * 1.5;
+      }
       
       ctx.save();
-      ctx.translate(boss.x, boss.y);
-      
-      // Hit flash effect
-      let col = '#ffffff';
-      if (boss.isHurt > 0) {
-        col = (gameFrame % 4 < 2) ? '#ffffff' : '#555555';
-        boss.isHurt--;
-      } else if (boss.hp < 125 && currentMode !== 'EINFACH') {
-        col = '#a3a3a3'; // Phase 2 turns grey core
+      if (gameState === 'DEFEAT_ANIM') {
+        ctx.globalAlpha = Math.max(0, 1 - defeatTimer / 120);
       }
+      
+      // Hit flash & shake effect
+      let col = '#ffffff';
+      let offsetHurtX = 0;
+      let offsetHurtY = 0;
+      if (boss.isHurt > 0) {
+        col = (gameFrame % 4 < 2) ? '#ef4444' : '#333333';
+        offsetHurtX = (Math.random() - 0.5) * 8;
+        offsetHurtY = (Math.random() - 0.5) * 8;
+        boss.isHurt--;
+      } else if (isPhase3) {
+        col = '#ef4444'; // Red pulsing core in Phase 3!
+      } else if (isPhase2) {
+        col = '#a3a3a3'; // Grey core in Phase 2
+      }
+      
+      ctx.translate(boss.x + offsetHurtX, boss.y + offsetHurtY);
 
       if (!isRetro) {
         ctx.shadowBlur = 15;
@@ -1750,32 +3473,39 @@
       }
       
       // Render floating glitch segments
-      if (gameState === 'DODGE' && boss.hp < 125 && currentMode !== 'EINFACH' && Math.random() < 0.25) {
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.25)';
+      if (gameState === 'DODGE' && isPhase2 && Math.random() < 0.25) {
+        ctx.fillStyle = isPhase3 ? 'rgba(239, 68, 68, 0.35)' : 'rgba(255, 255, 255, 0.25)';
         ctx.fillRect(-40 + Math.random()*20, -10 + Math.random()*20, 80, 5);
       }
       
       // Inner glowing core
-      ctx.fillStyle = col;
-      ctx.beginPath();
-      ctx.arc(0, 0, centerR, 0, Math.PI*2);
-      ctx.fill();
+      if (isPhase3) {
+        // Pulsing red star in Phase 3!
+        drawStar(ctx, 0, 0, 5, centerR * 1.3, centerR * 0.6, '#ef4444');
+      } else {
+        ctx.fillStyle = col;
+        ctx.beginPath();
+        ctx.arc(0, 0, centerR, 0, Math.PI*2);
+        ctx.fill();
+      }
 
       // Outer Ring 1
       ctx.strokeStyle = isRetro ? '#ffffff' : col;
       ctx.lineWidth = 2;
       ctx.beginPath();
-      ctx.arc(0, 0, 32, boss.pulse, boss.pulse + Math.PI*1.5);
+      let r1 = gameState === 'DEFEAT_ANIM' ? 32 + defeatTimer * 2 : 32;
+      ctx.arc(0, 0, r1, boss.pulse * speedMult, boss.pulse * speedMult + Math.PI*1.5);
       ctx.stroke();
 
       // Outer Ring 2 (Counter rotating octagon shape)
       ctx.save();
-      ctx.rotate(-boss.pulse * 0.7);
+      ctx.rotate(-boss.pulse * 0.7 * speedMult);
       ctx.beginPath();
+      let r2 = gameState === 'DEFEAT_ANIM' ? 46 + defeatTimer * 2.5 : 46;
       for (let i = 0; i < 8; i++) {
         let angle = (i / 8) * Math.PI * 2;
-        let px = Math.cos(angle) * 46;
-        let py = Math.sin(angle) * 46;
+        let px = Math.cos(angle) * r2;
+        let py = Math.sin(angle) * r2;
         if (i === 0) ctx.moveTo(px, py);
         else ctx.lineTo(px, py);
       }
@@ -1783,37 +3513,306 @@
       ctx.stroke();
       ctx.restore();
       
-      // Boss text tag
       ctx.restore();
       
-      ctx.save();
-      ctx.fillStyle = '#ffffff';
-      ctx.font = "10px 'Press Start 2P'";
-      ctx.textAlign = 'center';
-      
-      // Glitchy title during Phase 2
-      let displayName = boss.name;
-      if (boss.hp < 125 && currentMode !== 'EINFACH' && Math.random() < 0.15) {
-        displayName = "N1H1L.C0R3";
+      if (gameState !== 'DEFEAT_ANIM') {
+        ctx.save();
+        ctx.fillStyle = '#ffffff';
+        ctx.font = "10px 'Press Start 2P'";
+        ctx.textAlign = 'center';
+        
+        // Glitchy title during Phase 2/3
+        let displayName = boss.name;
+        if (isPhase3) {
+          displayName = "N1H1L_D0OM";
+        } else if (isPhase2 && Math.random() < 0.15) {
+          displayName = "N1H1L.C0R3";
+        }
+        ctx.fillText(displayName, boss.x, boss.y - 65);
+        
+        // Render HP Bar directly on top of boss
+        let hbWidth = 140;
+        let hbX = boss.x - hbWidth/2;
+        let hbY = boss.y - 52;
+        ctx.fillStyle = '#333333';
+        ctx.fillRect(hbX, hbY, hbWidth, 6);
+        ctx.fillStyle = '#ffffff';
+        if (isPhase3) ctx.fillStyle = '#ef4444'; // Red HP bar for Phase 3!
+        else if (isPhase2) ctx.fillStyle = '#a3a3a3';
+        ctx.fillRect(hbX, hbY, hbWidth * (boss.hp / boss.maxHp), 6);
+        ctx.restore();
       }
-      ctx.fillText(displayName, boss.x, boss.y - 65);
+    }
+
+    function renderBossPreview() {
+      const pcanvas = document.getElementById('bossPreviewCanvas');
+      if (!pcanvas) return;
+      const pctx = pcanvas.getContext('2d');
+      if (!pctx) return;
       
-      // Render HP Bar directly on top of boss
-      let hbWidth = 140;
-      let hbX = boss.x - hbWidth/2;
-      let hbY = boss.y - 52;
-      ctx.fillStyle = '#333333';
-      ctx.fillRect(hbX, hbY, hbWidth, 6);
-      ctx.fillStyle = '#ffffff';
-      if (boss.hp < 125 && currentMode !== 'EINFACH') ctx.fillStyle = '#a3a3a3';
-      ctx.fillRect(hbX, hbY, hbWidth * (boss.hp / boss.maxHp), 6);
+      // Clear with dark background matching the arcade cabinet
+      pctx.fillStyle = '#000000';
+      pctx.fillRect(0, 0, pcanvas.width, pcanvas.height);
       
-      ctx.restore();
+      // Select drawing based on selected boss index
+      if (selectedBossIndex === 0) {
+        // --- PUNKT PREVIEW ---
+        let cx = 150;
+        let cy = 100;
+        let psize = 38 + Math.sin(gameFrame * 0.05) * 8;
+        
+        pctx.save();
+        pctx.fillStyle = '#ffffff';
+        pctx.fillRect(cx - psize/2, cy - psize/2, psize, psize);
+        pctx.strokeStyle = '#888888';
+        pctx.lineWidth = 2.5;
+        pctx.strokeRect(cx - psize/2, cy - psize/2, psize, psize);
+        // Dot eyes inside
+        pctx.fillStyle = '#000000';
+        pctx.fillRect(cx - 10, cy - 6, 5, 5);
+        pctx.fillRect(cx + 5, cy - 6, 5, 5);
+        // Small line mouth
+        pctx.strokeStyle = '#000000';
+        pctx.lineWidth = 2;
+        pctx.beginPath();
+        pctx.moveTo(cx - 8, cy + 6);
+        pctx.lineTo(cx + 8, cy + 6);
+        pctx.stroke();
+        pctx.restore();
+      } else if (selectedBossIndex === 1) {
+        // --- GLITCH PREVIEW ---
+        let gox = (Math.random() - 0.5) * 4;
+        let goy = (Math.random() - 0.5) * 4;
+        let cx = 150 + gox;
+        let cy = 100 + goy;
+        
+        pctx.save();
+        pctx.strokeStyle = '#ffffff';
+        pctx.lineWidth = 2.5;
+        pctx.lineCap = 'round';
+        pctx.lineJoin = 'round';
+        
+        // Twitchy antennae
+        let legVib = Math.sin(gameFrame * 0.2) * 5;
+        pctx.beginPath();
+        pctx.moveTo(cx - 6, cy - 16);
+        pctx.lineTo(cx - 18 + legVib, cy - 34);
+        pctx.moveTo(cx + 6, cy - 16);
+        pctx.lineTo(cx + 18 - legVib, cy - 34);
+        pctx.stroke();
+        
+        // Twitchy legs
+        pctx.beginPath();
+        pctx.moveTo(cx - 15, cy - 5); pctx.lineTo(cx - 35, cy - 15 + legVib);
+        pctx.moveTo(cx - 17, cy + 2); pctx.lineTo(cx - 40, cy + legVib);
+        pctx.moveTo(cx - 15, cy + 8); pctx.lineTo(cx - 35, cy + 15 + legVib);
+        pctx.moveTo(cx + 15, cy - 5); pctx.lineTo(cx + 35, cy - 15 - legVib);
+        pctx.moveTo(cx + 17, cy + 2); pctx.lineTo(cx + 40, cy - legVib);
+        pctx.moveTo(cx + 15, cy + 8); pctx.lineTo(cx + 35, cy + 15 - legVib);
+        pctx.stroke();
+        
+        // Body
+        pctx.fillStyle = '#000000';
+        pctx.beginPath();
+        pctx.arc(cx, cy, 18, 0, Math.PI * 2);
+        pctx.fill();
+        pctx.stroke();
+        
+        // Eyes
+        pctx.fillStyle = '#ffffff';
+        pctx.beginPath();
+        pctx.arc(cx - 6, cy - 6, 2, 0, Math.PI * 2);
+        pctx.arc(cx + 6, cy - 6, 2, 0, Math.PI * 2);
+        pctx.fill();
+        
+        pctx.restore();
+      } else if (selectedBossIndex === 2) {
+        // --- GUMMI PREVIEW ---
+        let cx = 150;
+        let cy = 100;
+        
+        pctx.save();
+        pctx.translate(cx, cy);
+        pctx.rotate(-Math.PI / 8 + Math.sin(gameFrame * 0.04) * 0.05);
+        pctx.strokeStyle = '#ffffff';
+        pctx.lineWidth = 2.5;
+        
+        // Draw main eraser block
+        pctx.fillStyle = '#000000';
+        pctx.beginPath();
+        pctx.rect(-45, -25, 90, 50);
+        pctx.fill();
+        pctx.stroke();
+        
+        // Bolder inner stripe
+        pctx.beginPath();
+        pctx.moveTo(-15, -24);
+        pctx.lineTo(-15, 24);
+        pctx.stroke();
+        
+        // Falling crumbs
+        for (let i = 0; i < 3; i++) {
+          let crumbX = -30 + i * 30 + Math.sin(gameFrame * 0.05 + i) * 6;
+          let crumbY = 32 + ((gameFrame + i * 20) % 40);
+          pctx.fillStyle = 'rgba(255, 255, 255, ' + (1 - (crumbY - 32)/40) + ')';
+          pctx.fillRect(crumbX, crumbY, 3, 3);
+        }
+        
+        pctx.restore();
+      } else if (selectedBossIndex === 3) {
+        // --- MR. STICKMAN PREVIEW (HUGE SIZE) ---
+        let headBobY = Math.sin(gameFrame * 0.05) * 5;
+        let handBobY = Math.cos(gameFrame * 0.05) * 8;
+        
+        let cx = 150;
+        let cy = 100;
+        
+        let headX = cx;
+        let headY = cy - 35 + headBobY;
+        let headRadius = 24;
+        
+        let leftHandX = cx - 95;
+        let leftHandY = cy + 25 + handBobY;
+        let rightHandX = cx + 95;
+        let rightHandY = cy + 25 - handBobY;
+        
+        let strokeCol = '#ffffff';
+        
+        pctx.save();
+        pctx.strokeStyle = strokeCol;
+        pctx.lineWidth = 2.5;
+        pctx.lineCap = 'round';
+        pctx.lineJoin = 'round';
+        
+        // Draw Spine line
+        pctx.beginPath();
+        pctx.moveTo(headX, headY + headRadius);
+        pctx.lineTo(headX, cy + 55);
+        pctx.stroke();
+        
+        let shoulderY = headY + headRadius + 8;
+        
+        // Left arm and elbow
+        let leftElbowX = (headX + leftHandX) / 2 - 15;
+        let leftElbowY = (shoulderY + leftHandY) / 2 + 5;
+        pctx.beginPath();
+        pctx.moveTo(headX, shoulderY);
+        pctx.lineTo(leftElbowX, leftElbowY);
+        pctx.lineTo(leftHandX, leftHandY);
+        pctx.stroke();
+        
+        // Right arm and elbow
+        let rightElbowX = (headX + rightHandX) / 2 + 15;
+        let rightElbowY = (shoulderY + rightHandY) / 2 + 5;
+        pctx.beginPath();
+        pctx.moveTo(headX, shoulderY);
+        pctx.lineTo(rightElbowX, rightElbowY);
+        pctx.lineTo(rightHandX, rightHandY);
+        pctx.stroke();
+        
+        // Draw hands
+        drawSketchedHand(pctx, leftHandX, leftHandY, 12, 0, true, false, strokeCol, 2.5, strokeCol, 0);
+        drawSketchedHand(pctx, rightHandX, rightHandY, 12, 0, false, false, strokeCol, 2.5, strokeCol, 0);
+        
+        // Head circle
+        pctx.fillStyle = '#000000';
+        pctx.beginPath();
+        pctx.arc(headX, headY, headRadius, 0, Math.PI*2);
+        pctx.fill();
+        pctx.stroke();
+        
+        // Eyes
+        pctx.fillStyle = strokeCol;
+        pctx.beginPath();
+        pctx.arc(headX - 7, headY - 4, 2.5, 0, Math.PI*2);
+        pctx.arc(headX + 7, headY - 4, 2.5, 0, Math.PI*2);
+        pctx.fill();
+        
+        // Smile
+        pctx.beginPath();
+        pctx.arc(headX, headY + 5, 6, 0.1, Math.PI - 0.1);
+        pctx.stroke();
+        
+        pctx.restore();
+      } else if (selectedBossIndex === 4) {
+        // --- NIHIL.CORE PREVIEW (HUGE SIZE) ---
+        let pulseVal = gameFrame * 0.05;
+        let cx = 150;
+        let cy = 100;
+        
+        let centerR = 18 + Math.sin(pulseVal) * 3;
+        
+        pctx.save();
+        pctx.strokeStyle = '#ffffff';
+        pctx.lineWidth = 2;
+        pctx.lineCap = 'round';
+        pctx.lineJoin = 'round';
+        
+        // Inner glowing core
+        pctx.fillStyle = '#ffffff';
+        pctx.beginPath();
+        pctx.arc(cx, cy, centerR, 0, Math.PI*2);
+        pctx.fill();
+        
+        // Outer Ring 1
+        pctx.beginPath();
+        pctx.arc(cx, cy, 32, pulseVal, pulseVal + Math.PI*1.5);
+        pctx.stroke();
+        
+        // Outer Ring 2 (Octagon)
+        pctx.translate(cx, cy);
+        pctx.rotate(-pulseVal * 0.7);
+        pctx.beginPath();
+        for (let i = 0; i < 8; i++) {
+          let angle = (i / 8) * Math.PI * 2;
+          let px = Math.cos(angle) * 46;
+          let py = Math.sin(angle) * 46;
+          if (i === 0) pctx.moveTo(px, py);
+          else pctx.lineTo(px, py);
+        }
+        pctx.closePath();
+        pctx.stroke();
+        
+        pctx.restore();
+      }
     }
 
     // --- GAME LOOP & UPDATES ---
     function updateGame() {
       gameFrame++;
+
+      // 0. BOSS DEFEAT ANIMATION STATE
+      if (gameState === 'DEFEAT_ANIM') {
+        defeatTimer++;
+        
+        // Spawn defeat particles for active boss
+        if (defeatTimer % 3 === 0) {
+          if (currentBossType === 'PUNKT') {
+            spawnExplosion(boss.x + (Math.random()-0.5)*80, boss.y + (Math.random()-0.5)*80, Math.random() < 0.3 ? '#ef4444' : '#ffffff', 3);
+          } else if (currentBossType === 'GLITCH') {
+            spawnExplosion(boss.x + (Math.random()-0.5)*80, boss.y + (Math.random()-0.5)*80, Math.random() < 0.5 ? '#ef4444' : '#555555', 4);
+          } else if (currentBossType === 'GUMMI') {
+            spawnExplosion(boss.x + (Math.random()-0.5)*80, boss.y + (Math.random()-0.5)*80, '#ffffff', 3);
+          } else if (currentBossType === 'STICKMAN') {
+            spawnExplosion(boss.x + (Math.random()-0.5)*100, boss.y + (Math.random()-0.5)*120, '#ffffff', 4);
+          } else if (currentBossType === 'NIHIL') {
+            spawnExplosion(boss.x + (Math.random()-0.5)*120, boss.y + (Math.random()-0.5)*120, '#ffffff', 6);
+          }
+        }
+        
+        // Shake screen
+        if (currentBossType === 'NIHIL') {
+          shakeScreen(8, 4);
+        } else {
+          shakeScreen(4, 2);
+        }
+
+        if (defeatTimer >= 120) {
+          gameState = 'VICTORY';
+          showScreen('VICTORY');
+        }
+        return;
+      }
 
       // 1. INTRO CINEMATIC SCENE
       if (gameState === 'INTRO') {
@@ -1841,6 +3840,13 @@
         // Arena box dimensions interpolation
         let targetW = 260;
         let targetH = 260;
+        
+        let patId = activePatternsList[currentPattern % activePatternsList.length];
+        if (currentBossType === 'GUMMI' && patId === 2) {
+          targetW = 200;
+          targetH = 200;
+        }
+        
         boxWidth += (targetW - boxWidth) * 0.15;
         boxHeight += (targetH - boxHeight) * 0.15;
 
@@ -1872,6 +3878,55 @@
         for (let i = lasers.length - 1; i >= 0; i--) {
           lasers[i].update(Left, Right, Top, Bottom);
           if (lasers[i].toRemove) lasers.splice(i, 1);
+        }
+
+        // Update Stickman-specific entities
+        if (currentBossType === 'STICKMAN') {
+          for (let i = stickmanEntities.length - 1; i >= 0; i--) {
+            stickmanEntities[i].update(Left, Right, Top, Bottom);
+            if (stickmanEntities[i].toRemove) stickmanEntities.splice(i, 1);
+          }
+          
+          if (handPunch.active) {
+            handPunch.timer++;
+            let duration = handPunch.duration;
+            let warnDuration = handPunch.warnDuration;
+            if (handPunch.timer > warnDuration && handPunch.timer <= duration) {
+              let t = (handPunch.timer - warnDuration) / (duration - warnDuration);
+              let punchProgress = Math.sin(t * Math.PI);
+              let px = handPunch.startX + (handPunch.targetX - handPunch.startX) * punchProgress;
+              let py = handPunch.startY + (handPunch.targetY - handPunch.startY) * punchProgress;
+              
+              let dist = Math.sqrt((player.x - px)**2 + (player.y - py)**2);
+              if (dist < player.hitboxRadius + 14 && player.invincibleTime <= 0) {
+                damagePlayer(8);
+              }
+            }
+            if (handPunch.timer > duration) {
+              handPunch.active = false;
+            }
+          }
+          
+          if (handClap.active) {
+            handClap.timer++;
+            let duration = handClap.duration;
+            let warnDuration = handClap.warnDuration;
+            let clapFrame = warnDuration + Math.round((duration - warnDuration) / 2);
+            
+            if (handClap.timer === clapFrame) {
+              soundManager.playHit();
+              shakeScreen(16, 12);
+              spawnExplosion(BOX_CENTER_X, BOX_CENTER_Y, '#ffffff', 15);
+              
+              if (Math.abs(player.x - BOX_CENTER_X) < player.hitboxRadius + 28 && player.invincibleTime <= 0) {
+                damagePlayer(12);
+              }
+            }
+            
+            if (handClap.timer > duration) {
+              handClap.active = false;
+            }
+          }
         }
 
         // End of round check
@@ -1971,6 +4026,7 @@
       projectiles = [];
       blasters = [];
       lasers = [];
+      stickmanEntities = [];
     }
 
     function triggerHealAction() {
@@ -2015,6 +4071,10 @@
     }
 
     function stopSlider() {
+      // Prevent stopping too early (double-trigger buffer)
+      let minDistance = BOX_CENTER_X - slider.width/2 + 10;
+      if (slider.indicatorX < minDistance) return;
+
       slider.stopped = true;
       slider.resultTimer = 60; // 1 second animation
       
@@ -2026,7 +4086,7 @@
         stats.combo++;
         soundManager.playSelect();
       } else if (dist <= 14) {
-        slider.stopResult = 'GUT';
+        slider.stopResult = 'STARK';
         stats.combo = 0;
         soundManager.playSelect();
       } else if (dist <= 32) {
@@ -2047,48 +4107,62 @@
     function applySliderDamage() {
       let damage = 0;
       let col = '#ffffff';
+      let size = 10;
+      let label = '';
       
       if (slider.stopResult === 'CRIT') {
         let multiplier = 1;
         if (stats.combo === 2) multiplier = 1.33;
         if (stats.combo >= 3) multiplier = 1.78;
         damage = Math.round(18 * multiplier);
-        col = '#ffffff';
+        col = '#ef4444'; // Crit shows red!
+        size = 18;       // Large text
+        label = `${damage}`;
         shakeScreen(15, 8);
-      } else if (slider.stopResult === 'GUT') {
+      } else if (slider.stopResult === 'STARK') {
         damage = 12;
-        col = '#e0e0e0';
+        col = '#ffffff'; // Stark shows white!
+        size = 18;       // Large text
+        label = `${damage}`;
         shakeScreen(8, 4);
       } else if (slider.stopResult === 'NORMAL') {
         damage = 8;
         col = '#b5b5b5';
+        size = 10;       // Smaller text
+        label = `${damage}`;
         shakeScreen(5, 2);
       } else if (slider.stopResult === 'SCHWACH') {
         damage = 4;
         col = '#888888';
+        size = 10;       // Smaller text
+        label = `${damage}`;
       }
 
       if (damage > 0) {
         if (currentMode === 'EINFACH') {
           damage = Math.round(damage * 1.5);
         }
+        if (currentBossType === 'STICKMAN') {
+          damage = Math.round(damage * 1.10);
+        }
         boss.hp = Math.max(0, boss.hp - damage);
         boss.isHurt = 15;
         soundManager.playHit();
         spawnExplosion(boss.x, boss.y, col, 12);
-        
-        let label = `${damage} SCHADEN!`;
-        if (slider.stopResult === 'CRIT' && stats.combo > 1) {
-          label += ` (COMBO x${stats.combo})`;
-        }
-        addFloatingText(label, boss.x, boss.y - 20, col);
+        label = `${damage}`;
+        addFloatingText(label, boss.x, boss.y - 20, col, size);
       } else {
-        addFloatingText("FEHLSCHLAG!", boss.x, boss.y - 20, '#888888');
+        col = '#888888';
+        size = 18;       // Miss stands MISS, and is large!
+        label = "MISS";
+        addFloatingText(label, boss.x, boss.y - 20, col, size);
       }
 
       if (boss.hp <= 0) {
-        gameState = 'VICTORY';
-        showScreen('VICTORY');
+        gameState = 'DEFEAT_ANIM';
+        defeatTimer = 0;
+        soundManager.stopMusic();
+        soundManager.playHeal();
       } else {
         currentPattern++;
         startNextDodgingPhase();
@@ -2104,6 +4178,7 @@
       projectiles = [];
       blasters = [];
       lasers = [];
+      stickmanEntities = [];
 
       // Check for phase transitions
       if (boss.hp < 125 && currentMode !== 'EINFACH') {
@@ -2233,26 +4308,741 @@
     // --- PATTERNS & BEHAVIORS ---
     function runActivePattern(L, R, T, B) {
       let patId = activePatternsList[currentPattern % activePatternsList.length];
-      
-      // Render pattern indicator
       document.getElementById('hud-stage').innerText = `MODUS: ${currentMode} // ANGRIFF: ${getActivePatternName()}`;
 
-      // Ultimate combination attack overrides in Phase 2
-      let isPhase2 = (boss.hp < 125 && currentMode !== 'EINFACH');
+      let isPhase2 = (boss.hp < (boss.maxHp / 2) && currentMode !== 'EINFACH');
       
       if (isPhase2) {
-        // Trigger screen siren
         if (patternTimer === 1) {
           soundManager.playSiren();
           addFloatingText("ACHTUNG: ULTIMATE-ANGRIFF!", BOX_CENTER_X, BOX_CENTER_Y - 60, '#ffffff');
         }
         
-        // Spawn Phase 2 combined asteroid shards continuously
-        if (patternTimer % 75 === 0) {
-          projectiles.push(new Asteroid());
+        let passiveRate = (currentMode === 'SCHWER') ? 60 : 80;
+        if (patternTimer % passiveRate === 0) {
+          if (currentBossType === 'STICKMAN') {
+            if (Math.random() > 0.5) {
+              stickmanEntities.push(new StickmanRunner(L, R, T, B));
+            } else {
+              stickmanEntities.push(new HeliStickman(L, R, T, B));
+            }
+          } else if (currentBossType === 'NIHIL') {
+            let rand = Math.random();
+            if (rand < 0.34) {
+              projectiles.push(new Asteroid());
+            } else if (rand < 0.67) {
+              if (blasters.length < 3) blasters.push(new GasterBlaster());
+              else projectiles.push(new Asteroid());
+            } else {
+              let type = Math.random() > 0.5 ? 'H' : 'V';
+              let pos = Math.floor(Math.random() * 5);
+              lasers.push(new GridLaser(type, pos));
+            }
+          } else if (currentBossType === 'GLITCH') {
+            let rand = Math.random();
+            if (rand < 0.4) {
+              let angle = Math.random() * Math.PI * 2;
+              let speed = 2.0;
+              projectiles.push(new GlitchBullet(BOX_CENTER_X, boss.y + 40, Math.cos(angle)*speed, Math.sin(angle)*speed));
+            } else if (rand < 0.7) {
+              projectiles.push(new GlitchSymbol(L, R, T, B));
+            } else {
+              let type = Math.random() > 0.5 ? 'H' : 'V';
+              let pos = Math.floor(Math.random() * 5);
+              lasers.push(new GlitchLaser(type, pos));
+            }
+          } else if (currentBossType === 'GUMMI') {
+            let rand = Math.random();
+            if (rand < 0.8) {
+              projectiles.push(new RubberCrumb(L, R, T, B));
+            } else {
+              let hasSweeper = projectiles.some(p => p instanceof EraserSweeper);
+              if (!hasSweeper) {
+                projectiles.push(new EraserSweeper(L, R, T, B));
+              } else {
+                projectiles.push(new RubberCrumb(L, R, T, B));
+              }
+            }
+          } else if (currentBossType === 'PUNKT') {
+            let rand = Math.random();
+            if (rand < 0.7) {
+              projectiles.push(new PixelDust(L, R, T, B));
+            } else {
+              projectiles.push(new PixelExpansion(L, R, T, B));
+            }
+          }
+        }
+      }
+      
+      if (currentBossType === 'STICKMAN' && boss.hp < (boss.maxHp / 2) && currentMode !== 'EINFACH') {
+        let punchInterval = (currentMode === 'SCHWER') ? 90 : 130;
+        if (patternTimer % punchInterval === 50 && patternTimer < PATTERN_DURATION - 80) {
+          handPunch.active = true;
+          handPunch.hand = (Math.random() > 0.5) ? 'left' : 'right';
+          handPunch.timer = 0;
+          handPunch.targetX = player.x;
+          handPunch.targetY = player.y;
+          handPunch.startX = (handPunch.hand === 'left') ? L - 30 : R + 30;
+          handPunch.startY = BOX_CENTER_Y;
+          handPunch.warnDuration = (currentMode === 'SCHWER') ? 20 : 30;
+          handPunch.duration = (currentMode === 'SCHWER') ? 35 : 45;
+          soundManager.playBuzzer();
+          shakeScreen(6, 4);
         }
       }
 
+      if (currentBossType === 'STICKMAN') {
+        runStickmanPattern(patId, L, R, T, B, isPhase2);
+      } else if (currentBossType === 'NIHIL') {
+        runNihilPattern(patId, L, R, T, B, isPhase2);
+      } else if (currentBossType === 'GLITCH') {
+        runGlitchPattern(patId, L, R, T, B, isPhase2);
+      } else if (currentBossType === 'GUMMI') {
+        runGummiPattern(patId, L, R, T, B, isPhase2);
+      } else if (currentBossType === 'PUNKT') {
+        runPunktPattern(patId, L, R, T, B, isPhase2);
+      }
+    }
+
+    function runStickmanPattern(patId, L, R, T, B, isPhase2) {
+      switch(patId) {
+        case 0: // STICKMAN SWARM
+          let swarmRate = 35;
+          if (currentMode === 'EINFACH') swarmRate = 55;
+          else if (currentMode === 'SCHWER') swarmRate = 22;
+          if (isPhase2) swarmRate = Math.round(swarmRate * 0.7);
+          
+          if (patternTimer % swarmRate === 0 && patternTimer < PATTERN_DURATION - 60) {
+            stickmanEntities.push(new StickmanRunner(L, R, T, B));
+          }
+          break;
+          
+        case 1: // STICKMAN PISTOL DUEL
+          let duelRate = 65;
+          if (currentMode === 'EINFACH') duelRate = 90;
+          else if (currentMode === 'SCHWER') duelRate = 45;
+          if (isPhase2) duelRate = Math.round(duelRate * 0.7);
+          
+          if (patternTimer % duelRate === 0 && patternTimer < PATTERN_DURATION - 80) {
+            stickmanEntities.push(new PistolStickman(L, R, T, B));
+          }
+          break;
+          
+        case 2: // GIANT FIST PUNCH
+          let punchRate = 90;
+          if (currentMode === 'EINFACH') punchRate = 130;
+          else if (currentMode === 'SCHWER') punchRate = 60;
+          if (isPhase2) punchRate = Math.round(punchRate * 0.75);
+          
+          if (patternTimer % punchRate === 0 && patternTimer < PATTERN_DURATION - 80) {
+            stickmanEntities.push(new GiantPunch(L, R, T, B));
+          }
+          break;
+          
+        case 3: // HELICOPTER RAID
+          let heliRate = 45;
+          if (currentMode === 'EINFACH') heliRate = 70;
+          else if (currentMode === 'SCHWER') heliRate = 28;
+          if (isPhase2) heliRate = Math.round(heliRate * 0.7);
+          
+          if (patternTimer % heliRate === 0 && patternTimer < PATTERN_DURATION - 60) {
+            stickmanEntities.push(new HeliStickman(L, R, T, B));
+          }
+          break;
+          
+        case 4: // VÖLKERBALL-CHAOS
+          let ballRate = 50;
+          if (currentMode === 'EINFACH') ballRate = 75;
+          else if (currentMode === 'SCHWER') ballRate = 35;
+          
+          if (patternTimer % ballRate === 0 && patternTimer < PATTERN_DURATION - 80) {
+            stickmanEntities.push(new StickmanDodgeball(L, R, T, B));
+          }
+          break;
+          
+        case 5: // HÄNDE-KLATSCHEN
+          let clapRate = 120;
+          if (currentMode === 'EINFACH') clapRate = 180;
+          else if (currentMode === 'SCHWER') clapRate = 85;
+          
+          if (patternTimer % clapRate === 30 && patternTimer < PATTERN_DURATION - 80) {
+            handClap.active = true;
+            handClap.timer = 0;
+            handClap.warnDuration = (currentMode === 'SCHWER') ? 30 : 40;
+            handClap.duration = (currentMode === 'SCHWER') ? 42 : 55;
+            soundManager.playBuzzer();
+          }
+          break;
+          
+        case 6: // TINTEN-KLECSE
+          let splatRate = 45;
+          if (currentMode === 'EINFACH') splatRate = 70;
+          else if (currentMode === 'SCHWER') splatRate = 30;
+          
+          if (patternTimer % splatRate === 0 && patternTimer < PATTERN_DURATION - 60) {
+            stickmanEntities.push(new InkSplat(L, R, T, B));
+          }
+          break;
+          
+        case 7: // SPEERWERFER-ANGRIFF
+          let spearRate = 55;
+          if (currentMode === 'EINFACH') spearRate = 85;
+          else if (currentMode === 'SCHWER') spearRate = 35;
+          
+          if (patternTimer % spearRate === 0 && patternTimer < PATTERN_DURATION - 80) {
+            stickmanEntities.push(new StickmanSpear(L, R, T, B));
+          }
+          break;
+          
+        case 8: // BLEISTIFT-GEKRITZEL
+          if (patternTimer === 10) {
+            stickmanEntities.push(new PencilScribble(L, R, T, B));
+            addFloatingText("BLEISTIFT-ANGRIFF!", BOX_CENTER_X, BOX_CENTER_Y - 50, '#ffffff');
+          }
+          break;
+      }
+    }
+
+    // --- GLITCH BOSS BULLETS & PATTERNS ---
+    class GlitchBullet {
+      constructor(x, y, vx, vy) {
+        this.x = x;
+        this.y = y;
+        this.vx = vx;
+        this.vy = vy;
+        this.radius = 5;
+        this.toRemove = false;
+        this.flickerTimer = 0;
+        this.visible = true;
+      }
+      update(L, R, T, B) {
+        // Continuous movement - visible with glitch flicker effect
+        this.x += this.vx;
+        this.y += this.vy;
+        this.flickerTimer++;
+        // Visual flicker only (still physically present and damaging)
+        this.visible = (this.flickerTimer % 5 !== 0);
+        
+        let dist = Math.sqrt((player.x - this.x)**2 + (player.y - this.y)**2);
+        if (dist < player.hitboxRadius + this.radius && player.invincibleTime <= 0) {
+          damagePlayer(4);
+          this.toRemove = true;
+        }
+        
+        if (this.x < L - 25 || this.x > R + 25 || this.y < T - 25 || this.y > B + 25) {
+          this.toRemove = true;
+        }
+      }
+      draw() {
+        if (!this.visible) return; // Flicker effect
+        ctx.save();
+        // Glitch color shift
+        let col = (this.flickerTimer % 10 < 5) ? '#ffffff' : '#aaaaaa';
+        ctx.strokeStyle = col;
+        ctx.lineWidth = 1.5;
+        ctx.fillStyle = '#000000';
+        ctx.fillRect(this.x - this.radius, this.y - this.radius, this.radius*2, this.radius*2);
+        ctx.strokeRect(this.x - this.radius, this.y - this.radius, this.radius*2, this.radius*2);
+        ctx.beginPath();
+        ctx.moveTo(this.x - this.radius, this.y - this.radius);
+        ctx.lineTo(this.x + this.radius, this.y + this.radius);
+        ctx.stroke();
+        ctx.restore();
+      }
+    }
+
+    class GlitchLaser {
+      constructor(type, positionIndex) {
+        this.type = type;
+        this.pos = positionIndex;
+        this.timer = 0;
+        this.toRemove = false;
+        this.warnDuration = (currentMode === 'EINFACH') ? 35 : 24;
+        this.fireDuration = 14;
+        this.width = 10;
+        this.isBroken = (Math.random() < 0.40);
+        this.hasHit = false; // Prevent multi-frame damage
+      }
+      update(L, R, T, B) {
+        this.timer++;
+        let py = T + (B - T) * (this.pos + 1) / 6;
+        let px = L + (R - L) * (this.pos + 1) / 6;
+        
+        if (this.timer > this.warnDuration) {
+          if (this.isBroken) {
+            this.toRemove = true;
+            spawnExplosion(this.type === 'H' ? BOX_CENTER_X : px, this.type === 'H' ? py : BOX_CENTER_Y, '#888888', 4);
+            return;
+          }
+          
+          if (this.timer === this.warnDuration + 1) {
+             soundManager.playLaser();
+             shakeScreen(6, 2);
+          }
+          
+          // Only damage once per laser fire (prevent repeated frame damage)
+          if (!this.hasHit && player.invincibleTime <= 0) {
+            if (this.type === 'H') {
+              if (Math.abs(player.y - py) < player.hitboxRadius + this.width/2) {
+                damagePlayer(6);
+                this.hasHit = true;
+              }
+            } else {
+              if (Math.abs(player.x - px) < player.hitboxRadius + this.width/2) {
+                damagePlayer(6);
+                this.hasHit = true;
+              }
+            }
+          }
+        }
+        
+        if (this.timer > this.warnDuration + this.fireDuration) {
+          this.toRemove = true;
+        }
+      }
+      draw(L, R, T, B) {
+        let py = T + (B - T) * (this.pos + 1) / 6;
+        let px = L + (R - L) * (this.pos + 1) / 6;
+        
+        ctx.save();
+        if (this.timer <= this.warnDuration) {
+          if (Math.floor(gameFrame / 3) % 2 === 0) {
+            ctx.fillStyle = this.isBroken ? 'rgba(150, 150, 150, 0.15)' : 'rgba(255, 255, 255, 0.25)';
+            if (this.type === 'H') {
+              ctx.fillRect(L, py - this.width/2, R - L, this.width);
+            } else {
+              ctx.fillRect(px - this.width/2, T, this.width, B - T);
+            }
+          }
+          if (this.isBroken && Math.floor(gameFrame / 15) % 2 === 0) {
+            ctx.fillStyle = '#888888';
+            ctx.font = "8px 'Press Start 2P'";
+            ctx.fillText("ERR", this.type === 'H' ? L + 10 : px - 12, this.type === 'H' ? py - 8 : T + 20);
+          }
+        } else if (!this.isBroken) {
+          ctx.strokeStyle = '#ffffff';
+          ctx.lineWidth = this.width;
+          ctx.beginPath();
+          if (this.type === 'H') {
+            ctx.moveTo(L, py); ctx.lineTo(R, py);
+          } else {
+            ctx.moveTo(px, T); ctx.lineTo(px, B);
+          }
+          ctx.stroke();
+        }
+        ctx.restore();
+      }
+    }
+
+    class GlitchSymbol {
+      constructor(L, R, T, B) {
+        this.x = L + 15 + Math.random() * (boxWidth - 30);
+        this.y = T - 15;
+        this.vy = 1.2 + Math.random() * 1.0;
+        if (currentMode === 'SCHWER') this.vy *= 1.3;
+        this.char = ['ERROR', 'BUG', 'GLITCH', '@', '#', '?', '*', 'NaN', 'null'][Math.floor(Math.random() * 9)];
+        this.toRemove = false;
+        this.width = 10;
+      }
+      update(L, R, T, B) {
+        this.y += this.vy;
+        
+        let dist = Math.sqrt((player.x - this.x)**2 + (player.y - this.y)**2);
+        if (dist < player.hitboxRadius + 8 && player.invincibleTime <= 0) {
+          damagePlayer(4);
+          this.toRemove = true;
+        }
+        
+        if (this.y > B + 15) {
+          this.toRemove = true;
+        }
+      }
+      draw() {
+        ctx.save();
+        ctx.fillStyle = '#ffffff';
+        ctx.font = "8px 'Press Start 2P'";
+        ctx.textAlign = 'center';
+        ctx.fillText(this.char, this.x, this.y);
+        ctx.restore();
+      }
+    }
+
+    function runGlitchPattern(patId, L, R, T, B, isPhase2) {
+      let isPhase3 = (boss.hp < (boss.maxHp / 4) && currentMode === 'SCHWER');
+      switch(patId) {
+        case 0: // LAGGENDE SPLITTER - now shoots spread of bullets
+          let splitRate = (currentMode === 'EINFACH') ? 45 : ((currentMode === 'NORMAL') ? 28 : 18);
+          if (patternTimer % splitRate === 0 && patternTimer < PATTERN_DURATION - 60) {
+            let baseAngle = Math.random() * Math.PI * 2;
+            let count = isPhase2 ? 4 : 2;
+            let speed = isPhase2 ? 2.5 : 2.0;
+            for (let i = 0; i < count; i++) {
+              let angle = baseAngle + (i / count) * Math.PI * 2;
+              projectiles.push(new GlitchBullet(BOX_CENTER_X, boss.y + 50, Math.cos(angle)*speed, Math.sin(angle)*speed));
+            }
+          }
+          break;
+        case 1: // FEHLERHAFTER RASTER - glitch laser grid
+          let laserRate = (currentMode === 'EINFACH') ? 60 : ((currentMode === 'NORMAL') ? 40 : 28);
+          if (patternTimer % laserRate === 0 && patternTimer < PATTERN_DURATION - 70) {
+            let type = (Math.random() > 0.5) ? 'H' : 'V';
+            let pos = Math.floor(Math.random() * 5);
+            lasers.push(new GlitchLaser(type, pos));
+            // In phase 2 sometimes fire 2 at once
+            if (isPhase2 && Math.random() < 0.4) {
+              lasers.push(new GlitchLaser(type === 'H' ? 'V' : 'H', Math.floor(Math.random() * 5)));
+            }
+          }
+          break;
+        case 2: // AUSNAHME-FLUT - symbol rain
+          let overflowRate = (currentMode === 'EINFACH') ? 38 : ((currentMode === 'NORMAL') ? 22 : 14);
+          if (patternTimer % overflowRate === 0 && patternTimer < PATTERN_DURATION - 50) {
+            projectiles.push(new GlitchSymbol(L, R, T, B));
+            if (isPhase2) projectiles.push(new GlitchSymbol(L, R, T, B));
+          }
+          break;
+        case 3: // PHASE 3 - BINARY BULLET STORM (SCHWER only)
+          let binaryRate = 10;
+          if (patternTimer % binaryRate === 0 && patternTimer < PATTERN_DURATION - 60) {
+            let angle = Math.random() * Math.PI * 2;
+            let speed = 2.8;
+            projectiles.push(new GlitchBullet(BOX_CENTER_X, boss.y + 40, Math.cos(angle)*speed, Math.sin(angle)*speed));
+          }
+          // Also fire cross-pattern lasers
+          if (patternTimer % 50 === 0 && patternTimer < PATTERN_DURATION - 80) {
+            for (let p = 0; p < 5; p++) {
+              lasers.push(new GlitchLaser(p % 2 === 0 ? 'H' : 'V', p));
+            }
+          }
+          break;
+      }
+    }
+
+    // --- GUMMI BOSS BULLETS & PATTERNS ---
+    class EraserSweeper {
+      constructor(L, R, T, B) {
+        this.x = L;
+        this.y = T;
+        this.w = 40;
+        this.h = boxHeight;
+        this.vx = (currentMode === 'EINFACH') ? 1.5 : ((currentMode === 'SCHWER') ? 3.5 : 2.5);
+        this.direction = 1; // 1 = right, -1 = left
+        this.timer = 0;
+        this.toRemove = false;
+        this.lastHitFrame = -30; // Hit cooldown tracker
+      }
+      update(L, R, T, B) {
+        this.x += this.vx * this.direction;
+        
+        if (this.x + this.w >= R) {
+          this.x = R - this.w;
+          this.direction = -1;
+          soundManager.playHit();
+          shakeScreen(4, 2);
+        } else if (this.x <= L) {
+          this.x = L;
+          this.direction = 1;
+          soundManager.playHit();
+          shakeScreen(4, 2);
+        }
+        
+        if (player.invincibleTime <= 0) {
+          if (player.x + player.radius > this.x && player.x - player.radius < this.x + this.w) {
+            // Hit cooldown: only deal damage every 30 frames to prevent frame-rate multiplied damage
+            if (gameFrame - this.lastHitFrame >= 30) {
+              damagePlayer(8);
+              this.lastHitFrame = gameFrame;
+              player.x += this.direction * 12;
+            }
+          }
+        }
+      }
+      draw() {
+        ctx.save();
+        ctx.strokeStyle = '#ffffff';
+        ctx.fillStyle = '#050505';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.rect(this.x, this.y, this.w, this.h);
+        ctx.fill();
+        ctx.stroke();
+        
+        ctx.strokeStyle = '#888888';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        for (let i = 0; i < this.h; i += 30) {
+          ctx.moveTo(this.x, this.y + i);
+          ctx.lineTo(this.x + this.w, this.y + i + 15);
+        }
+        ctx.stroke();
+        ctx.restore();
+      }
+    }
+
+    class RubberCrumb {
+      constructor(L, R, T, B) {
+        this.x = L + 15 + Math.random() * (boxWidth - 30);
+        this.y = T - 10;
+        this.vx = (Math.random() - 0.5) * 2;
+        this.vy = 1.8 + Math.random() * 1.5;
+        this.radius = 4 + Math.random() * 3;
+        this.bounced = false;
+        this.toRemove = false;
+      }
+      update(L, R, T, B) {
+        this.x += this.vx;
+        this.y += this.vy;
+        
+        if (this.y + this.radius >= B) {
+          this.y = B - this.radius;
+          if (!this.bounced) {
+            this.vy = -this.vy * 0.5;
+            this.bounced = true;
+          } else {
+            this.toRemove = true;
+          }
+        }
+        
+        if (this.x - this.radius <= L) {
+          this.x = L + this.radius;
+          this.vx = -this.vx;
+        } else if (this.x + this.radius >= R) {
+          this.x = R - this.radius;
+          this.vx = -this.vx;
+        }
+        
+        let dist = Math.sqrt((player.x - this.x)**2 + (player.y - this.y)**2);
+        if (dist < player.hitboxRadius + this.radius && player.invincibleTime <= 0) {
+          damagePlayer(4);
+          this.toRemove = true;
+        }
+      }
+      draw() {
+        ctx.save();
+        ctx.strokeStyle = '#ffffff';
+        ctx.fillStyle = '#000000';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI*2);
+        ctx.fill();
+        ctx.stroke();
+        ctx.restore();
+      }
+    }
+
+    function runGummiPattern(patId, L, R, T, B, isPhase2) {
+      let isPhase3 = (boss.hp < (boss.maxHp / 4) && currentMode === 'SCHWER');
+      switch(patId) {
+        case 0: // WISCH-REINIGUNG
+          if (patternTimer === 1) {
+            projectiles.push(new EraserSweeper(L, R, T, B));
+            addFloatingText("ERASER BLOCK!", BOX_CENTER_X, BOX_CENTER_Y - 50, '#ffffff');
+          }
+          // Phase 2: add crumbs alongside sweeper
+          if (isPhase2) {
+            let crumbRate2 = (currentMode === 'SCHWER') ? 22 : 35;
+            if (patternTimer % crumbRate2 === 0 && patternTimer < PATTERN_DURATION - 60) {
+              projectiles.push(new RubberCrumb(L, R, T, B));
+            }
+          }
+          break;
+        case 1: // GUMMI-KRÜMEL
+          let crumbRate = (currentMode === 'EINFACH') ? 45 : ((currentMode === 'NORMAL') ? 28 : 18);
+          if (patternTimer % crumbRate === 0 && patternTimer < PATTERN_DURATION - 60) {
+            projectiles.push(new RubberCrumb(L, R, T, B));
+            if (isPhase2) projectiles.push(new RubberCrumb(L, R, T, B));
+          }
+          break;
+        case 2: // BOX-KOMPRESSION
+          if (patternTimer === 1) {
+            addFloatingText("BOX SCHRUMPFT!", BOX_CENTER_X, BOX_CENTER_Y - 50, '#ffffff');
+          }
+          if (Math.floor(gameFrame / 15) % 2 === 0) {
+            ctx.save();
+            ctx.fillStyle = '#888888';
+            ctx.font = "8px 'Press Start 2P'";
+            ctx.textAlign = 'center';
+            ctx.fillText("SICHERHEITSZONE REDUZIERT", BOX_CENTER_X, BOX_CENTER_Y + 4);
+            ctx.restore();
+          }
+          break;
+        case 3: // PHASE 3 - DOPPEL-WISCHER (SCHWER only)
+          if (patternTimer === 1) {
+            projectiles.push(new EraserSweeper(L, R, T, B));
+            // Second sweeper starts from the right
+            let s2 = new EraserSweeper(L, R, T, B);
+            s2.x = R - s2.w;
+            s2.direction = -1;
+            projectiles.push(s2);
+            addFloatingText("DOPPEL-WISCHER!", BOX_CENTER_X, BOX_CENTER_Y - 50, '#ef4444');
+          }
+          // Phase 3 also rains crumbs
+          if (patternTimer % 14 === 0 && patternTimer < PATTERN_DURATION - 60) {
+            projectiles.push(new RubberCrumb(L, R, T, B));
+          }
+          break;
+      }
+    }
+
+    // --- PUNKT BOSS BULLETS & PATTERNS ---
+    class PixelDust {
+      constructor(L, R, T, B) {
+        this.x = L + 10 + Math.random() * (boxWidth - 20);
+        this.y = T - 8;
+        this.vy = 0.8 + Math.random() * 0.8;
+        this.size = 6;
+        this.toRemove = false;
+      }
+      update(L, R, T, B) {
+        this.y += this.vy;
+        this.x += Math.sin(this.y * 0.05) * 0.4;
+        
+        let dist = Math.sqrt((player.x - this.x)**2 + (player.y - this.y)**2);
+        if (dist < player.hitboxRadius + this.size/2 && player.invincibleTime <= 0) {
+          damagePlayer(3);
+          this.toRemove = true;
+        }
+        
+        if (this.y > B + 8) {
+          this.toRemove = true;
+        }
+      }
+      draw() {
+        ctx.save();
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(this.x - this.size/2, this.y - this.size/2, this.size, this.size);
+        ctx.restore();
+      }
+    }
+
+    class PixelExpansion {
+      constructor(L, R, T, B) {
+        this.x = BOX_CENTER_X;
+        this.y = T - 10;
+        this.size = 20;
+        this.timer = 0;
+        this.toRemove = false;
+        this.lastHitFrame = -40; // Cooldown tracker
+      }
+      update(L, R, T, B) {
+        this.timer++;
+        
+        let t = this.timer / PATTERN_DURATION;
+        let targetY = T + (B - T) * 0.5;
+        
+        if (t < 0.4) {
+          let progress = t / 0.4;
+          this.y = (T - 10) + (targetY - (T - 10)) * Math.sin(progress * Math.PI/2);
+          this.size = 20 + 40 * Math.sin(progress * Math.PI/2);
+        } else if (t > 0.6) {
+          let progress = (t - 0.6) / 0.4;
+          this.y = targetY + ((T - 10) - targetY) * Math.sin(progress * Math.PI/2);
+          this.size = 60 - 40 * Math.sin(progress * Math.PI/2);
+        } else {
+          this.y = targetY;
+          this.size = 60 + Math.sin(gameFrame * 0.2) * 5;
+        }
+        
+        let half = this.size / 2;
+        if (player.invincibleTime <= 0) {
+          if (player.x + player.radius > this.x - half && player.x - player.radius < this.x + half &&
+              player.y + player.radius > this.y - half && player.y - player.radius < this.y + half) {
+            // 40-frame damage cooldown to prevent multi-frame hits
+            if (gameFrame - this.lastHitFrame >= 40) {
+              damagePlayer(8);
+              this.lastHitFrame = gameFrame;
+              let dx = player.x - this.x;
+              let dy = player.y - this.y;
+              let len = Math.sqrt(dx*dx + dy*dy) || 1;
+              player.x += (dx / len) * 10;
+              player.y += (dy / len) * 10;
+            }
+          }
+        }
+        
+        if (this.timer >= PATTERN_DURATION) {
+          this.toRemove = true;
+        }
+      }
+      draw() {
+        ctx.save();
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(this.x - this.size/2, this.y - this.size/2, this.size, this.size);
+        ctx.strokeStyle = '#888888';
+        ctx.lineWidth = 2.5;
+        ctx.strokeRect(this.x - this.size/2, this.y - this.size/2, this.size, this.size);
+        ctx.restore();
+      }
+    }
+
+    function runPunktPattern(patId, L, R, T, B, isPhase2) {
+      let isPhase3 = (boss.hp < (boss.maxHp / 4) && currentMode === 'SCHWER');
+      switch(patId) {
+        case 0: // PIXEL-STAUB - pixel rain, faster when phase 2/3
+          let dustRate = (currentMode === 'EINFACH') ? 45 : ((currentMode === 'NORMAL') ? 24 : 14);
+          if (isPhase2) dustRate = Math.round(dustRate * 0.6);
+          if (patternTimer % dustRate === 0 && patternTimer < PATTERN_DURATION - 50) {
+            projectiles.push(new PixelDust(L, R, T, B));
+            if (isPhase2) projectiles.push(new PixelDust(L, R, T, B));
+          }
+          break;
+        case 1: // EXPANSION - visible pixel attack from above
+          if (patternTimer === 1) {
+            projectiles.push(new PixelExpansion(L, R, T, B));
+            addFloatingText("PIXEL-EXPANSION!", BOX_CENTER_X, BOX_CENTER_Y - 50, '#ffffff');
+          }
+          // Phase 2: add dust while expansion is active
+          if (isPhase2) {
+            let dustRate2 = (currentMode === 'SCHWER') ? 18 : 28;
+            if (patternTimer % dustRate2 === 0 && patternTimer < PATTERN_DURATION - 60) {
+              projectiles.push(new PixelDust(L, R, T, B));
+            }
+          }
+          break;
+        case 2: // PIXEL-STRAHL - visible beam sweeping across the box
+          // A visible pixel beam that sweeps across - no invisible gravity pull
+          if (patternTimer === 1) {
+            addFloatingText("PIXEL-STRAHL!", BOX_CENTER_X, BOX_CENTER_Y - 50, '#ffffff');
+          }
+          
+          let beamProgress = patternTimer / PATTERN_DURATION;
+          let beamX = L + (R - L) * beamProgress;
+          let beamWidth = 20;
+          
+          // Draw visible beam warning
+          ctx.save();
+          if (Math.floor(gameFrame / 4) % 2 === 0) {
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+            ctx.fillRect(beamX - beamWidth/2, T, beamWidth, B - T);
+          }
+          // Actual damaging portion
+          ctx.fillStyle = '#ffffff';
+          ctx.fillRect(beamX - beamWidth/2, T, beamWidth, B - T);
+          ctx.restore();
+          
+          // Damage check for beam
+          if (player.invincibleTime <= 0) {
+            if (Math.abs(player.x - beamX) < player.hitboxRadius + beamWidth/2) {
+              damagePlayer(5);
+            }
+          }
+          break;
+        case 3: // PHASE 3 - PIXEL-ERUPTION: pixel expansion + rain storm (SCHWER only)
+          if (patternTimer === 1) {
+            projectiles.push(new PixelExpansion(L, R, T, B));
+            addFloatingText("PIXEL-ERUPTION!!!", BOX_CENTER_X, BOX_CENTER_Y - 50, '#ef4444');
+          }
+          // Dense pixel rain
+          let eruRate = 8;
+          if (patternTimer % eruRate === 0 && patternTimer < PATTERN_DURATION - 50) {
+            projectiles.push(new PixelDust(L, R, T, B));
+            projectiles.push(new PixelDust(L, R, T, B));
+          }
+          break;
+      }
+    }
+
+    function runNihilPattern(patId, L, R, T, B, isPhase2) {
       switch(patId) {
         case 0: // GRID LASER SPAM
           let gridInterval = 40;
@@ -2279,15 +5069,14 @@
           break;
           
         case 2: // PROZEDURAL GASTER BLASTER
-          let blasterInterval = 45;
-          if (currentMode === 'EINFACH') blasterInterval = 85;
-          else if (currentMode === 'SCHWER') blasterInterval = 28;
+          let blasterInterval = 70;
+          if (currentMode === 'EINFACH') blasterInterval = 95;
+          else if (currentMode === 'SCHWER') blasterInterval = 50;
           if (isPhase2) blasterInterval = Math.round(blasterInterval * 0.7);
 
           if (patternTimer % blasterInterval === 0 && patternTimer < PATTERN_DURATION - 90) {
             blasters.push(new GasterBlaster());
-            // Double blasters for Hard difficulty
-            if (currentMode === 'SCHWER' && Math.random() < 0.75) {
+            if (currentMode === 'SCHWER' && Math.random() < 0.20) {
               setTimeout(() => {
                 if (gameState === 'DODGE') blasters.push(new GasterBlaster());
               }, 250);
@@ -2309,7 +5098,6 @@
           if (currentMode === 'EINFACH') swarmInterval = 45;
           else if (currentMode === 'SCHWER') swarmInterval = 14;
           if (patternTimer % swarmInterval === 0 && patternTimer < PATTERN_DURATION - 60) {
-            // Spawn swarm along random outer edge
             let edge = Math.floor(Math.random() * 4);
             let bulletCount = 5;
             if (currentMode === 'EINFACH') bulletCount = 3;
@@ -2321,16 +5109,16 @@
               if (currentMode === 'EINFACH') speed = 2.0;
               else if (currentMode === 'SCHWER') speed = 5.5;
               
-              if (edge === 0) { // Top edge
+              if (edge === 0) {
                 bx = L + (R - L) * i / (bulletCount - 1);
                 by = T - 15;
-              } else if (edge === 1) { // Bottom edge
+              } else if (edge === 1) {
                 bx = L + (R - L) * i / (bulletCount - 1);
                 by = B + 15;
-              } else if (edge === 2) { // Left edge
+              } else if (edge === 2) {
                 bx = L - 15;
                 by = T + (B - T) * i / (bulletCount - 1);
-              } else { // Right edge
+              } else {
                 bx = R + 15;
                 by = T + (B - T) * i / (bulletCount - 1);
               }
@@ -2338,10 +5126,7 @@
               let dx = player.x - bx;
               let dy = player.y - by;
               let len = Math.sqrt(dx*dx + dy*dy) || 1;
-              
               let b = new GenericBullet('square', bx, by, (dx/len)*speed, (dy/len)*speed, '#ffffff');
-              
-              // Homing functionality in hard mode
               if (currentMode === 'SCHWER') {
                 b.homing = true;
               }
@@ -2350,46 +5135,34 @@
           }
           break;
           
-        case 5: // GRAVITY SCHWANKUNG (Platformer test)
-          if (patternTimer === 1) {
-            player.gravityDir = 'BOTTOM'; // Standard platformer starts on first frame
-          }
+        case 5: // STERNEN-SCHAUER (Replacing GRAVITY SCHWANKUNG)
+          let starInterval = 28;
+          if (currentMode === 'EINFACH') starInterval = 50;
+          else if (currentMode === 'SCHWER') starInterval = 18;
           
-          let shiftInterval = 120;
-          if (currentMode === 'EINFACH') shiftInterval = 220;
-          else if (currentMode === 'SCHWER') shiftInterval = 80;
-          if (patternTimer % shiftInterval === 0 && patternTimer < PATTERN_DURATION - 50) {
-            // Pick random gravity axis
-            const dirs = ['TOP', 'BOTTOM', 'LEFT', 'RIGHT'];
-            let nextDir = dirs[Math.floor(Math.random()*dirs.length)];
-            player.gravityDir = nextDir;
-            addFloatingText(`GRAVITATION: ${nextDir}!`, BOX_CENTER_X, BOX_CENTER_Y - 40, '#ffffff');
-            soundManager.playBuzzer();
-            shakeScreen(10, 5);
-          }
-
-          // Spawn hurdles to jump over
-          let wallStarRate = 35;
-          if (currentMode === 'EINFACH') wallStarRate = 60;
-          else if (currentMode === 'SCHWER') wallStarRate = 22;
-          
-          if (patternTimer % wallStarRate === 0 && patternTimer < PATTERN_DURATION - 60) {
-            // Bullet wave crossing based on gravity axis
+          if (patternTimer % starInterval === 0 && patternTimer < PATTERN_DURATION - 60) {
             let speed = 3.5;
             if (currentMode === 'EINFACH') speed = 2.0;
             else if (currentMode === 'SCHWER') speed = 5.0;
-            if (player.gravityDir === 'BOTTOM' || player.gravityDir === 'TOP') {
-              // Horizontal sweeping wall stars
-              projectiles.push(new GenericBullet('star', L - 10, B - 12, speed, 0, '#d1d5db'));
-            } else {
-              // Vertical sweeping wall stars
-              projectiles.push(new GenericBullet('star', L + 12, T - 10, 0, speed, '#d1d5db'));
+            
+            let side = Math.floor(Math.random() * 4);
+            if (side === 0) { // left to right
+              let y = T + 20 + Math.random() * (B - T - 40);
+              projectiles.push(new GenericBullet('star', L - 10, y, speed, 0, '#d1d5db'));
+            } else if (side === 1) { // right to left
+              let y = T + 20 + Math.random() * (B - T - 40);
+              projectiles.push(new GenericBullet('star', R + 10, y, -speed, 0, '#d1d5db'));
+            } else if (side === 2) { // top to bottom
+              let x = L + 20 + Math.random() * (R - L - 40);
+              projectiles.push(new GenericBullet('star', x, T - 10, 0, speed, '#d1d5db'));
+            } else { // bottom to top
+              let x = L + 20 + Math.random() * (R - L - 40);
+              projectiles.push(new GenericBullet('star', x, B + 10, 0, -speed, '#d1d5db'));
             }
           }
           break;
           
         case 6: // SCHWARZES LOCH ORBIT
-          // Vortex attraction
           let pull = 0.85;
           if (currentMode === 'EINFACH') pull = 0.4;
           else if (currentMode === 'SCHWER') pull = 1.35;
@@ -2401,7 +5174,6 @@
           player.x += (dx / dist) * pull;
           player.y += (dy / dist) * pull;
 
-          // Spawn obstacles in box quadrants
           if (patternTimer === 1) {
             projectiles.push(new Obstacle(BOX_CENTER_X - 50, BOX_CENTER_Y - 50, 20, 0));
             projectiles.push(new Obstacle(BOX_CENTER_X + 50, BOX_CENTER_Y - 50, 20, Math.PI/4));
@@ -2409,7 +5181,6 @@
             projectiles.push(new Obstacle(BOX_CENTER_X + 50, BOX_CENTER_Y + 50, 20, Math.PI*0.75));
           }
           
-          // Spawn bullets outwards from the center of the vortex
           let bulletSpawnRate = 25;
           if (currentMode === 'EINFACH') bulletSpawnRate = 50;
           else if (currentMode === 'SCHWER') bulletSpawnRate = 15;
@@ -2435,14 +5206,14 @@
             let speed = 3.8;
             if (currentMode === 'EINFACH') speed = 2.0;
             else if (currentMode === 'SCHWER') speed = 4.8;
-            let amp = (currentMode === 'NORMAL') ? 45 : 65;
+            let amp = 115;
+            if (currentMode === 'EINFACH') amp = 105;
+            else if (currentMode === 'SCHWER') amp = 120;
             let freq = 0.05;
             
-            // Left to right wave
             let y1 = BOX_CENTER_Y + Math.sin(patternTimer * freq) * amp;
             projectiles.push(new GenericBullet('star', L - 10, y1, speed, 0, '#d1d5db'));
             
-            // Right to left wave (Only on Hard Mode)
             if (currentMode === 'SCHWER') {
               let y2 = BOX_CENTER_Y + Math.cos(patternTimer * freq) * amp;
               projectiles.push(new GenericBullet('star', R + 10, y2, -speed, 0, '#d1d5db'));
@@ -2457,11 +5228,17 @@
           
           if (patternTimer % glitchRate === 0 && patternTimer < PATTERN_DURATION - 80) {
             shakeScreen(20, 8);
-            soundManager.playBuzzer();
             
-            // Trigger color inversion flash
-            if (isRetro) {
-              addFloatingText("FEHLERHAFTES RASTER!", BOX_CENTER_X, BOX_CENTER_Y - 50, '#ffffff');
+            let type = (Math.random() > 0.5) ? 'H' : 'V';
+            let pos = Math.floor(Math.random() * 5);
+            let gl = new GridLaser(type, pos);
+            gl.width = 20;
+            gl.warnDuration = (currentMode === 'EINFACH') ? 32 : ((currentMode === 'NORMAL') ? 24 : 16);
+            gl.fireDuration = 10;
+            lasers.push(gl);
+            
+            if (Math.random() < 0.35) {
+              addFloatingText("RASTER-FEHLER!", BOX_CENTER_X, BOX_CENTER_Y - 50, '#ffffff');
             }
             
             let row = Math.floor(Math.random()*4);
@@ -2469,9 +5246,8 @@
             if (currentMode === 'EINFACH') speed = 2.8;
             else if (currentMode === 'SCHWER') speed = 7.5;
             
-            // Spawn row of fast horizontal boxes
             for (let i = 0; i < 5; i++) {
-              let bx = L - 15 - (i * 20);
+              let bx = L - 15 - (i * 25);
               let by = T + 40 + row * 45;
               projectiles.push(new GenericBullet('square', bx, by, speed, 0, '#ffffff'));
             }
@@ -2482,8 +5258,7 @@
 
     // --- RENDER SYSTEM ---
     function renderGame() {
-      // Clear with Inversion color handling
-      let isInverted = (gameState === 'DODGE' && boss.hp < 125 && currentMode !== 'EINFACH' && Math.floor(gameFrame / 30) % 2 === 0);
+      let isInverted = false;
       
       // Apply screen shake
       ctx.save();
@@ -2529,7 +5304,7 @@
           ctx.fillText("[ SPACE ] WEITER", 200, 380);
         }
         
-        drawBossCore();
+        drawActiveBoss();
         ctx.restore();
         return;
       }
@@ -2555,7 +5330,7 @@
 
       // 2. Draw black hole vortex graphics inside center of box (Only for ORBIT pattern)
       let patId = activePatternsList[currentPattern % activePatternsList.length];
-      if (gameState === 'DODGE' && patId === 6) {
+      if (gameState === 'DODGE' && patId === 6 && currentBossType === 'NIHIL') {
         ctx.save();
         ctx.translate(BOX_CENTER_X, BOX_CENTER_Y);
         ctx.rotate(gameFrame * 0.05);
@@ -2577,12 +5352,15 @@
       }
 
       // 3. Draw game entities
-      if (gameState === 'DODGE' || gameState === 'TRANSITION' || gameState === 'HEAL_ANIM') {
+      if (gameState === 'DODGE' || gameState === 'TRANSITION' || gameState === 'HEAL_ANIM' || gameState === 'DEFEAT_ANIM') {
         // Render grid lines below bullets
         if (gameState === 'DODGE') {
           lasers.forEach(laser => laser.draw(L, R, T, B));
           projectiles.forEach(bullet => bullet.draw());
           blasters.forEach(blaster => blaster.draw());
+          if (currentBossType === 'STICKMAN') {
+            stickmanEntities.forEach(ent => ent.draw(L, R, T, B));
+          }
         }
 
         // Draw Player Heart
@@ -2610,15 +5388,19 @@
       }
 
       // 4. Draw Rhythm Slider HUD
-      if (gameState === 'SLIDER' || gameState === 'TRANSITION') {
+      if (gameState === 'SLIDER') {
         ctx.save();
         
-        // Target vertical center highlight
+        // Target vertical center highlight - STARK zone (dist <= 14)
         ctx.fillStyle = 'rgba(255, 255, 255, 0.15)';
-        ctx.fillRect(BOX_CENTER_X - 12, T + 4, 24, boxHeight - 8);
+        ctx.fillRect(BOX_CENTER_X - 14, T + 4, 28, boxHeight - 8);
 
-        // Core Target Line
-        ctx.strokeStyle = '#ffffff';
+        // Crit zone highlight - CRIT zone (dist <= 4)
+        ctx.fillStyle = 'rgba(239, 68, 68, 0.35)';
+        ctx.fillRect(BOX_CENTER_X - 4, T + 4, 8, boxHeight - 8);
+
+        // Core Target Line (Red)
+        ctx.strokeStyle = '#ef4444';
         ctx.lineWidth = 3;
         ctx.beginPath();
         ctx.moveTo(BOX_CENTER_X, T + 4);
@@ -2626,48 +5408,46 @@
         ctx.stroke();
 
         // Indicator Bar
-        if (gameState === 'SLIDER') {
-          ctx.strokeStyle = '#ffffff';
-          ctx.lineWidth = 4;
-          if (!isRetro) {
-            ctx.shadowBlur = 10;
-            ctx.shadowColor = '#ffffff';
-          }
-          ctx.beginPath();
-          ctx.moveTo(slider.indicatorX, T + 3);
-          ctx.lineTo(slider.indicatorX, B - 3);
-          ctx.stroke();
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 4;
+        if (!isRetro) {
+          ctx.shadowBlur = 10;
+          ctx.shadowColor = '#ffffff';
+        }
+        ctx.beginPath();
+        ctx.moveTo(slider.indicatorX, T + 3);
+        ctx.lineTo(slider.indicatorX, B - 3);
+        ctx.stroke();
 
-          // Stopped text result animation
-          if (slider.stopped) {
-            ctx.fillStyle = '#ffffff';
-            ctx.font = "10px 'Press Start 2P'";
-            ctx.textAlign = 'center';
-            
-            let label = slider.stopResult;
-            let col = '#ffffff';
-            if (label === 'CRIT') col = '#ffffff';
-            else if (label === 'GUT') col = '#e0e0e0';
-            else if (label === 'NORMAL') col = '#b5b5b5';
-            else if (label === 'SCHWACH') col = '#888888';
-            else if (label === 'MISS') col = '#555555';
-            
-            ctx.fillStyle = col;
-            ctx.fillText(label, BOX_CENTER_X, T - 18);
-          }
+        // Stopped text result animation
+        if (slider.stopped) {
+          ctx.fillStyle = '#ffffff';
+          ctx.font = "10px 'Press Start 2P'";
+          ctx.textAlign = 'center';
+          
+          let label = slider.stopResult;
+          let col = '#ffffff';
+          if (label === 'CRIT') col = '#ef4444';
+          else if (label === 'STARK') col = '#ffffff';
+          else if (label === 'NORMAL') col = '#b5b5b5';
+          else if (label === 'SCHWACH') col = '#888888';
+          else if (label === 'MISS') col = '#555555';
+          
+          ctx.fillStyle = col;
+          ctx.fillText(label, BOX_CENTER_X, T - 18);
         }
         ctx.restore();
       }
 
       // Draw Boss Model
-      drawBossCore();
+      drawActiveBoss();
 
       // Render Floating Text Alerts
       textAlerts.forEach(alert => {
         ctx.save();
         ctx.fillStyle = alert.color;
         ctx.globalAlpha = alert.opacity;
-        ctx.font = "8px 'Press Start 2P'";
+        ctx.font = `${alert.fontSize || 8}px 'Press Start 2P'`;
         ctx.textAlign = 'center';
         ctx.fillText(alert.text, alert.x, alert.y);
         ctx.restore();
@@ -2682,31 +5462,42 @@
         ctx.restore();
       });
 
-      // Draw Player HUD under box
+      // Draw Centered Player HP HUD under box
       ctx.save();
-      let hudX = 170;
+      let barWidth = 130;
+      let barHeight = 14;
       let hudY = 512;
-      ctx.fillStyle = '#ffffff';
+      
+      let hpText = "HP";
+      let valText = `${player.hp}/${player.maxHp}`;
+      
       ctx.font = "11px 'Press Start 2P'";
       ctx.textAlign = 'left';
-      ctx.fillText("AG.SOUL   LV 19", hudX, hudY);
       
-      // HP Bar block
-      let barWidth = 110;
-      let barHeight = 12;
-      let barX = hudX + 130;
+      let hpTextWidth = ctx.measureText(hpText).width;
+      let valTextWidth = ctx.measureText(valText).width;
+      let spacing = 12;
+      let totalHudWidth = hpTextWidth + spacing + barWidth + spacing + valTextWidth;
+      
+      let startX = 300 - totalHudWidth / 2;
+      
+      // 1. Draw "HP" label
+      ctx.fillStyle = '#ffffff';
+      ctx.fillText(hpText, startX, hudY);
+      
+      // 2. Draw Bar
+      let barX = startX + hpTextWidth + spacing;
       let barY = hudY - 10;
-      
-      ctx.fillStyle = '#333333'; // Dark grey background
+      ctx.fillStyle = '#333333';
       ctx.fillRect(barX, barY, barWidth, barHeight);
       
-      ctx.fillStyle = '#ef4444'; // Red main health fill
+      ctx.fillStyle = '#ef4444';
       let fillW = barWidth * (player.hp / player.maxHp);
       ctx.fillRect(barX, barY, fillW, barHeight);
       
-      // Numeric text display
+      // 3. Draw values
       ctx.fillStyle = '#ffffff';
-      ctx.fillText(`HP ${player.hp}/${player.maxHp}`, barX + barWidth + 15, hudY);
+      ctx.fillText(valText, barX + barWidth + spacing, hudY);
       ctx.restore();
 
       ctx.restore(); // Screen shake end
@@ -2725,6 +5516,9 @@
     function mainLoop() {
       updateGame();
       renderGame();
+      if (gameState === 'MENU') {
+        renderBossPreview();
+      }
       requestAnimationFrame(mainLoop);
     }
 
