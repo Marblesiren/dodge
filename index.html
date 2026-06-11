@@ -328,7 +328,7 @@
     const bossesConfig = [
       { name: "PUNKT (I)", desc: "Ein einsamer Riesenpixel. Wächst mit jeder Phase. Schießt langsamen Pixel-Regen." },
       { name: "GLITCH (II)", desc: "Ein glitschender Code-Fehler. Schießt fehlerhafte Projektile und Laser-Störfeuer." },
-      { name: "GUMMI (III)", desc: "Ein bröckelnder Vektor-Radierer. Schrumpft das Spielfeld und wirft Krümel." },
+      { name: "RUBBER (III)", desc: "Ein bröckelnder Vektor-Radierer. Schrumpft das Spielfeld und wirft Krümel." },
       { name: "MR. STICKMAN (VI)", desc: "Ein agiler, riesiger Skizzen-Krieger. Kopf über der Box, Hände an den Seiten." },
       { name: "NIHIL.CORE (X)", desc: "Der weiße Raum-Kern. Instabile Quantengeometrie und Bullet-Hell." }
     ];
@@ -432,8 +432,8 @@
           this.name = 'GLITCH (II)';
           this.hp = 100;
           this.maxHp = 100;
-        } else if (currentBossType === 'GUMMI') {
-          this.name = 'GUMMI (III)';
+        } else if (currentBossType === 'RUBBER') {
+          this.name = 'RUBBER (III)';
           this.hp = 120;
           this.maxHp = 120;
         } else if (currentBossType === 'PUNKT') {
@@ -755,7 +755,7 @@
     function startGame() {
       if (selectedBossIndex === 0) currentBossType = 'PUNKT';
       else if (selectedBossIndex === 1) currentBossType = 'GLITCH';
-      else if (selectedBossIndex === 2) currentBossType = 'GUMMI';
+      else if (selectedBossIndex === 2) currentBossType = 'RUBBER';
       else if (selectedBossIndex === 3) currentBossType = 'STICKMAN';
       else if (selectedBossIndex === 4) currentBossType = 'NIHIL';
       
@@ -817,7 +817,7 @@
     };
 
     function setupPatterns() {
-      if (currentBossType === 'GLITCH' || currentBossType === 'GUMMI' || currentBossType === 'PUNKT') {
+      if (currentBossType === 'GLITCH' || currentBossType === 'RUBBER' || currentBossType === 'PUNKT') {
         // In SCHWER mode, add pattern 3 (Phase 3 special attack)
         if (currentMode === 'SCHWER') {
           activePatternsList = [0, 1, 2, 3];
@@ -867,9 +867,9 @@
         "AUSNAHME-FLUT",
         "BINAR-STURM!!!"
       ];
-      const gummiNames = [
+      const rubberNames = [
         "WISCH-REINIGUNG",
-        "GUMMI-KRÜMEL",
+        "RUBBER-KRÜMEL",
         "BOX-KOMPRESSION",
         "DOPPEL-WISCHER!!!"
       ];
@@ -884,7 +884,7 @@
       if (currentBossType === 'STICKMAN') str = stickmanNames[patId];
       else if (currentBossType === 'NIHIL') str = nihilNames[patId];
       else if (currentBossType === 'GLITCH') str = glitchNames[patId];
-      else if (currentBossType === 'GUMMI') str = gummiNames[patId];
+      else if (currentBossType === 'RUBBER') str = rubberNames[patId];
       else if (currentBossType === 'PUNKT') str = punktNames[patId];
       
       if (boss.hp < (boss.maxHp / 2) && currentMode !== 'EINFACH') {
@@ -2583,8 +2583,8 @@
         drawBossCore();
       } else if (currentBossType === 'GLITCH') {
         drawGlitchBoss();
-      } else if (currentBossType === 'GUMMI') {
-        drawGummiBoss();
+      } else if (currentBossType === 'RUBBER') {
+        drawRubberBoss();
       } else if (currentBossType === 'PUNKT') {
         drawPunktBoss();
       }
@@ -2750,7 +2750,7 @@
     }
 
 
-    function drawGummiBoss() {
+    function drawRubberBoss() {
       boss.pulse += 0.05;
       let isPhase2 = (boss.hp < (boss.maxHp / 2) && currentMode !== 'EINFACH');
       let isPhase3 = (boss.hp < (boss.maxHp / 4) && currentMode === 'SCHWER');
@@ -3627,7 +3627,7 @@
         
         pctx.restore();
       } else if (selectedBossIndex === 2) {
-        // --- GUMMI PREVIEW ---
+        // --- RUBBER PREVIEW ---
         let cx = 150;
         let cy = 100;
         
@@ -3791,7 +3791,7 @@
             spawnExplosion(boss.x + (Math.random()-0.5)*80, boss.y + (Math.random()-0.5)*80, Math.random() < 0.3 ? '#ef4444' : '#ffffff', 3);
           } else if (currentBossType === 'GLITCH') {
             spawnExplosion(boss.x + (Math.random()-0.5)*80, boss.y + (Math.random()-0.5)*80, Math.random() < 0.5 ? '#ef4444' : '#555555', 4);
-          } else if (currentBossType === 'GUMMI') {
+          } else if (currentBossType === 'RUBBER') {
             spawnExplosion(boss.x + (Math.random()-0.5)*80, boss.y + (Math.random()-0.5)*80, '#ffffff', 3);
           } else if (currentBossType === 'STICKMAN') {
             spawnExplosion(boss.x + (Math.random()-0.5)*100, boss.y + (Math.random()-0.5)*120, '#ffffff', 4);
@@ -3842,7 +3842,7 @@
         let targetH = 260;
         
         let patId = activePatternsList[currentPattern % activePatternsList.length];
-        if (currentBossType === 'GUMMI' && patId === 2) {
+        if (currentBossType === 'RUBBER' && patId === 2) {
           targetW = 200;
           targetH = 200;
         }
@@ -4351,18 +4351,8 @@
               let pos = Math.floor(Math.random() * 5);
               lasers.push(new GlitchLaser(type, pos));
             }
-          } else if (currentBossType === 'GUMMI') {
-            let rand = Math.random();
-            if (rand < 0.8) {
-              projectiles.push(new RubberCrumb(L, R, T, B));
-            } else {
-              let hasSweeper = projectiles.some(p => p instanceof EraserSweeper);
-              if (!hasSweeper) {
-                projectiles.push(new EraserSweeper(L, R, T, B));
-              } else {
-                projectiles.push(new RubberCrumb(L, R, T, B));
-              }
-            }
+          } else if (currentBossType === 'RUBBER') {
+            projectiles.push(new RubberCrumb(L, R, T, B));
           } else if (currentBossType === 'PUNKT') {
             let rand = Math.random();
             if (rand < 0.7) {
@@ -4397,8 +4387,8 @@
         runNihilPattern(patId, L, R, T, B, isPhase2);
       } else if (currentBossType === 'GLITCH') {
         runGlitchPattern(patId, L, R, T, B, isPhase2);
-      } else if (currentBossType === 'GUMMI') {
-        runGummiPattern(patId, L, R, T, B, isPhase2);
+      } else if (currentBossType === 'RUBBER') {
+        runRubberPattern(patId, L, R, T, B, isPhase2);
       } else if (currentBossType === 'PUNKT') {
         runPunktPattern(patId, L, R, T, B, isPhase2);
       }
@@ -4529,7 +4519,7 @@
           this.toRemove = true;
         }
         
-        if (this.x < L - 25 || this.x > R + 25 || this.y < T - 25 || this.y > B + 25) {
+        if (this.x < L - 25 || this.x > R + 25 || this.y < boss.y - 20 || this.y > B + 25) {
           this.toRemove = true;
         }
       }
@@ -4582,13 +4572,16 @@
           
           // Only damage once per laser fire (prevent repeated frame damage)
           if (!this.hasHit && player.invincibleTime <= 0) {
+            let progress = Math.min(1, (this.timer - this.warnDuration) / 12);
             if (this.type === 'H') {
-              if (Math.abs(player.y - py) < player.hitboxRadius + this.width/2) {
+              let trailMaxX = L + (R - L) * progress;
+              if (player.x - player.hitboxRadius <= trailMaxX && Math.abs(player.y - py) < player.hitboxRadius + this.width/2) {
                 damagePlayer(6);
                 this.hasHit = true;
               }
             } else {
-              if (Math.abs(player.x - px) < player.hitboxRadius + this.width/2) {
+              let trailMaxY = T + (B - T) * progress;
+              if (player.y - player.hitboxRadius <= trailMaxY && Math.abs(player.x - px) < player.hitboxRadius + this.width/2) {
                 damagePlayer(6);
                 this.hasHit = true;
               }
@@ -4620,8 +4613,9 @@
             ctx.fillText("ERR", this.type === 'H' ? L + 10 : px - 12, this.type === 'H' ? py - 8 : T + 20);
           }
         } else if (!this.isBroken) {
-          ctx.strokeStyle = '#ffffff';
-          ctx.lineWidth = this.width;
+          // Semi-transparent background beam line
+          ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+          ctx.lineWidth = 3;
           ctx.beginPath();
           if (this.type === 'H') {
             ctx.moveTo(L, py); ctx.lineTo(R, py);
@@ -4629,6 +4623,32 @@
             ctx.moveTo(px, T); ctx.lineTo(px, B);
           }
           ctx.stroke();
+
+          // Draw binary trail of 0s and 1s scrolling super fast
+          ctx.fillStyle = '#ffffff';
+          ctx.font = "bold 12px 'Share Tech Mono', monospace";
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          
+          let progress = Math.min(1, (this.timer - this.warnDuration) / 12); // travels fully in 12 frames
+          
+          if (this.type === 'H') {
+            let totalW = R - L;
+            let currentW = totalW * progress;
+            let step = 15;
+            for (let d = 0; d < currentW; d += step) {
+              let char = ((Math.floor(d / step) + Math.floor(gameFrame * 0.25)) % 2 === 0) ? '0' : '1';
+              ctx.fillText(char, L + d + step/2, py);
+            }
+          } else {
+            let totalH = B - T;
+            let currentH = totalH * progress;
+            let step = 15;
+            for (let d = 0; d < currentH; d += step) {
+              let char = ((Math.floor(d / step) + Math.floor(gameFrame * 0.25)) % 2 === 0) ? '0' : '1';
+              ctx.fillText(char, px, T + d + step/2);
+            }
+          }
         }
         ctx.restore();
       }
@@ -4718,20 +4738,52 @@
       }
     }
 
-    // --- GUMMI BOSS BULLETS & PATTERNS ---
+    // --- RUBBER BOSS BULLETS & PATTERNS ---
     class EraserSweeper {
-      constructor(L, R, T, B) {
+      constructor(L, R, T, B, gap = 'none') {
         this.x = L;
-        this.y = T;
+        this.gap = gap;
         this.w = 40;
-        this.h = boxHeight;
         this.vx = (currentMode === 'EINFACH') ? 1.5 : ((currentMode === 'SCHWER') ? 3.5 : 2.5);
         this.direction = 1; // 1 = right, -1 = left
         this.timer = 0;
         this.toRemove = false;
         this.lastHitFrame = -30; // Hit cooldown tracker
+        this.warnDuration = 35; // warning frames before it moves/damages
+        
+        let totalH = B - T;
+        if (this.gap === 'top') {
+          this.y = T + 70;
+          this.h = totalH - 70;
+        } else if (this.gap === 'bottom') {
+          this.y = T;
+          this.h = totalH - 70;
+        } else {
+          this.y = T;
+          this.h = totalH;
+        }
       }
       update(L, R, T, B) {
+        this.timer++;
+        
+        // Dynamically adjust height and Y position based on current box size
+        let totalH = B - T;
+        if (this.gap === 'top') {
+          this.y = T + 70;
+          this.h = totalH - 70;
+        } else if (this.gap === 'bottom') {
+          this.y = T;
+          this.h = totalH - 70;
+        } else {
+          this.y = T;
+          this.h = totalH;
+        }
+        
+        if (this.timer <= this.warnDuration) {
+          this.lastHitFrame = gameFrame;
+          return;
+        }
+        
         this.x += this.vx * this.direction;
         
         if (this.x + this.w >= R) {
@@ -4747,7 +4799,12 @@
         }
         
         if (player.invincibleTime <= 0) {
-          if (player.x + player.radius > this.x && player.x - player.radius < this.x + this.w) {
+          let px = player.x;
+          let py = player.y;
+          let r = player.hitboxRadius;
+          
+          if (px + r > this.x && px - r < this.x + this.w &&
+              py + r > this.y && py - r < this.y + this.h) {
             // Hit cooldown: only deal damage every 30 frames to prevent frame-rate multiplied damage
             if (gameFrame - this.lastHitFrame >= 30) {
               damagePlayer(8);
@@ -4759,22 +4816,37 @@
       }
       draw() {
         ctx.save();
-        ctx.strokeStyle = '#ffffff';
-        ctx.fillStyle = '#050505';
-        ctx.lineWidth = 3;
-        ctx.beginPath();
-        ctx.rect(this.x, this.y, this.w, this.h);
-        ctx.fill();
-        ctx.stroke();
-        
-        ctx.strokeStyle = '#888888';
-        ctx.lineWidth = 1.5;
-        ctx.beginPath();
-        for (let i = 0; i < this.h; i += 30) {
-          ctx.moveTo(this.x, this.y + i);
-          ctx.lineTo(this.x + this.w, this.y + i + 15);
+        if (this.timer <= this.warnDuration) {
+          // Blinking warning rect
+          if (Math.floor(gameFrame / 4) % 2 === 0) {
+            ctx.strokeStyle = '#ef4444';
+            ctx.lineWidth = 2.5;
+            ctx.setLineDash([4, 4]);
+            ctx.strokeRect(this.x, this.y, this.w, this.h);
+            
+            ctx.fillStyle = '#ef4444';
+            ctx.font = "8px 'Press Start 2P'";
+            ctx.textAlign = 'center';
+            ctx.fillText("WARNUNG", this.x + this.w/2, this.y + this.h/2 + 3);
+          }
+        } else {
+          ctx.strokeStyle = '#ffffff';
+          ctx.fillStyle = '#050505';
+          ctx.lineWidth = 3;
+          ctx.beginPath();
+          ctx.rect(this.x, this.y, this.w, this.h);
+          ctx.fill();
+          ctx.stroke();
+          
+          ctx.strokeStyle = '#888888';
+          ctx.lineWidth = 1.5;
+          ctx.beginPath();
+          for (let i = 0; i < this.h; i += 30) {
+            ctx.moveTo(this.x, this.y + i);
+            ctx.lineTo(this.x + this.w, this.y + i + 15);
+          }
+          ctx.stroke();
         }
-        ctx.stroke();
         ctx.restore();
       }
     }
@@ -4830,12 +4902,12 @@
       }
     }
 
-    function runGummiPattern(patId, L, R, T, B, isPhase2) {
+    function runRubberPattern(patId, L, R, T, B, isPhase2) {
       let isPhase3 = (boss.hp < (boss.maxHp / 4) && currentMode === 'SCHWER');
       switch(patId) {
         case 0: // WISCH-REINIGUNG
           if (patternTimer === 1) {
-            projectiles.push(new EraserSweeper(L, R, T, B));
+            projectiles.push(new EraserSweeper(L, R, T, B, Math.random() > 0.5 ? 'top' : 'bottom'));
             addFloatingText("ERASER BLOCK!", BOX_CENTER_X, BOX_CENTER_Y - 50, '#ffffff');
           }
           // Phase 2: add crumbs alongside sweeper
@@ -4846,7 +4918,7 @@
             }
           }
           break;
-        case 1: // GUMMI-KRÜMEL
+        case 1: // RUBBER-KRÜMEL
           let crumbRate = (currentMode === 'EINFACH') ? 45 : ((currentMode === 'NORMAL') ? 28 : 18);
           if (patternTimer % crumbRate === 0 && patternTimer < PATTERN_DURATION - 60) {
             projectiles.push(new RubberCrumb(L, R, T, B));
@@ -4856,25 +4928,20 @@
         case 2: // BOX-KOMPRESSION
           if (patternTimer === 1) {
             addFloatingText("BOX SCHRUMPFT!", BOX_CENTER_X, BOX_CENTER_Y - 50, '#ffffff');
-          }
-          if (Math.floor(gameFrame / 15) % 2 === 0) {
-            ctx.save();
-            ctx.fillStyle = '#888888';
-            ctx.font = "8px 'Press Start 2P'";
-            ctx.textAlign = 'center';
-            ctx.fillText("SICHERHEITSZONE REDUZIERT", BOX_CENTER_X, BOX_CENTER_Y + 4);
-            ctx.restore();
+            addFloatingText("SICHERHEITSZONE REDUZIERT", BOX_CENTER_X, BOX_CENTER_Y - 30, '#888888');
           }
           break;
         case 3: // PHASE 3 - DOPPEL-WISCHER (SCHWER only)
           if (patternTimer === 1) {
-            projectiles.push(new EraserSweeper(L, R, T, B));
-            // Second sweeper starts from the right
-            let s2 = new EraserSweeper(L, R, T, B);
+            projectiles.push(new EraserSweeper(L, R, T, B, 'top'));
+            addFloatingText("DOPPEL-WISCHER!", BOX_CENTER_X, BOX_CENTER_Y - 50, '#ef4444');
+          }
+          if (patternTimer === 70) {
+            // Second sweeper starts from the right with a delay
+            let s2 = new EraserSweeper(L, R, T, B, 'bottom');
             s2.x = R - s2.w;
             s2.direction = -1;
             projectiles.push(s2);
-            addFloatingText("DOPPEL-WISCHER!", BOX_CENTER_X, BOX_CENTER_Y - 50, '#ef4444');
           }
           // Phase 3 also rains crumbs
           if (patternTimer % 14 === 0 && patternTimer < PATTERN_DURATION - 60) {
@@ -4923,11 +4990,19 @@
         this.timer = 0;
         this.toRemove = false;
         this.lastHitFrame = -40; // Cooldown tracker
+        this.warnDuration = 35; // Warning frames before active movement
       }
       update(L, R, T, B) {
         this.timer++;
         
-        let t = this.timer / PATTERN_DURATION;
+        if (this.timer <= this.warnDuration) {
+          this.lastHitFrame = gameFrame;
+          return;
+        }
+        
+        let activeTimer = this.timer - this.warnDuration;
+        let activeDuration = PATTERN_DURATION - this.warnDuration;
+        let t = activeTimer / activeDuration;
         let targetY = T + (B - T) * 0.5;
         
         if (t < 0.4) {
@@ -4945,8 +5020,8 @@
         
         let half = this.size / 2;
         if (player.invincibleTime <= 0) {
-          if (player.x + player.radius > this.x - half && player.x - player.radius < this.x + half &&
-              player.y + player.radius > this.y - half && player.y - player.radius < this.y + half) {
+          if (player.x + player.hitboxRadius > this.x - half && player.x - player.hitboxRadius < this.x + half &&
+              player.y + player.hitboxRadius > this.y - half && player.y - player.hitboxRadius < this.y + half) {
             // 40-frame damage cooldown to prevent multi-frame hits
             if (gameFrame - this.lastHitFrame >= 40) {
               damagePlayer(8);
@@ -4960,17 +5035,85 @@
           }
         }
         
-        if (this.timer >= PATTERN_DURATION) {
+        if (activeTimer >= activeDuration) {
           this.toRemove = true;
         }
       }
       draw() {
         ctx.save();
-        ctx.fillStyle = '#ffffff';
-        ctx.fillRect(this.x - this.size/2, this.y - this.size/2, this.size, this.size);
-        ctx.strokeStyle = '#888888';
-        ctx.lineWidth = 2.5;
-        ctx.strokeRect(this.x - this.size/2, this.y - this.size/2, this.size, this.size);
+        if (this.timer <= this.warnDuration) {
+          // Draw a blinking warning box at target center
+          if (Math.floor(gameFrame / 5) % 2 === 0) {
+            ctx.strokeStyle = '#ef4444';
+            ctx.lineWidth = 2.5;
+            ctx.setLineDash([4, 4]);
+            let targetSize = 60;
+            let targetY = BOX_CENTER_Y;
+            ctx.strokeRect(this.x - targetSize/2, targetY - targetSize/2, targetSize, targetSize);
+            
+            // Warning text / sign inside
+            ctx.fillStyle = '#ef4444';
+            ctx.font = "8px 'Press Start 2P'";
+            ctx.textAlign = 'center';
+            ctx.fillText("ACHTUNG!", this.x, targetY + 4);
+          }
+        } else {
+          ctx.fillStyle = '#ffffff';
+          ctx.fillRect(this.x - this.size/2, this.y - this.size/2, this.size, this.size);
+          ctx.strokeStyle = '#888888';
+          ctx.lineWidth = 2.5;
+          ctx.strokeRect(this.x - this.size/2, this.y - this.size/2, this.size, this.size);
+        }
+        ctx.restore();
+      }
+    }
+
+    class PixelStrahl {
+      constructor(L, R, T, B) {
+        this.timer = 0;
+        this.toRemove = false;
+        this.warnDuration = 35;
+        this.fireDuration = PATTERN_DURATION - this.warnDuration;
+        this.width = 20;
+      }
+      update(L, R, T, B) {
+        this.timer++;
+        if (this.timer > this.warnDuration) {
+          let activeTimer = this.timer - this.warnDuration;
+          let beamProgress = activeTimer / this.fireDuration;
+          let beamX = L + (R - L) * beamProgress;
+          
+          if (player.invincibleTime <= 0) {
+            if (Math.abs(player.x - beamX) < player.hitboxRadius + this.width/2) {
+              damagePlayer(5);
+            }
+          }
+        }
+        if (this.timer > this.warnDuration + this.fireDuration) {
+          this.toRemove = true;
+        }
+      }
+      draw(L, R, T, B) {
+        ctx.save();
+        if (this.timer <= this.warnDuration) {
+          // Draw a blinking warning vertical line at the start position (L)
+          if (Math.floor(gameFrame / 4) % 2 === 0) {
+            ctx.strokeStyle = '#ef4444';
+            ctx.lineWidth = 2.5;
+            ctx.setLineDash([4, 4]);
+            ctx.beginPath();
+            ctx.moveTo(L, T);
+            ctx.lineTo(L, B);
+            ctx.stroke();
+          }
+        } else {
+          let activeTimer = this.timer - this.warnDuration;
+          let beamProgress = activeTimer / this.fireDuration;
+          let beamX = L + (R - L) * beamProgress;
+          
+          ctx.fillStyle = '#ffffff';
+          ctx.fillRect(beamX - this.width/2, T, this.width, B - T);
+        }
         ctx.restore();
       }
     }
@@ -5000,31 +5143,9 @@
           }
           break;
         case 2: // PIXEL-STRAHL - visible beam sweeping across the box
-          // A visible pixel beam that sweeps across - no invisible gravity pull
           if (patternTimer === 1) {
             addFloatingText("PIXEL-STRAHL!", BOX_CENTER_X, BOX_CENTER_Y - 50, '#ffffff');
-          }
-          
-          let beamProgress = patternTimer / PATTERN_DURATION;
-          let beamX = L + (R - L) * beamProgress;
-          let beamWidth = 20;
-          
-          // Draw visible beam warning
-          ctx.save();
-          if (Math.floor(gameFrame / 4) % 2 === 0) {
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
-            ctx.fillRect(beamX - beamWidth/2, T, beamWidth, B - T);
-          }
-          // Actual damaging portion
-          ctx.fillStyle = '#ffffff';
-          ctx.fillRect(beamX - beamWidth/2, T, beamWidth, B - T);
-          ctx.restore();
-          
-          // Damage check for beam
-          if (player.invincibleTime <= 0) {
-            if (Math.abs(player.x - beamX) < player.hitboxRadius + beamWidth/2) {
-              damagePlayer(5);
-            }
+            lasers.push(new PixelStrahl(L, R, T, B));
           }
           break;
         case 3: // PHASE 3 - PIXEL-ERUPTION: pixel expansion + rain storm (SCHWER only)
